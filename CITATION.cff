@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Personalised Basal Tuner (PBT) — Paper 1 Pipeline"
+version: "1.0.0"
+authors:
+  - family-names: "Gasca García"
+    given-names: "Daniel"
+    # Replace with your real ORCID if you want it displayed by GitHub/Zenodo:
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+date-released: "2025-10-19"
+license: "MIT"
+doi: "10.5281/zenodo.XXXXXXX"  # replace after you get the DOI
+preferred-citation:
+  type: software
+  title: "PBT — Paper 1 Pipeline"
+  authors:
+    - family-names: "Gasca García"
+      given-names: "Daniel"
+  year: 2025
