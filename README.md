@@ -124,10 +124,23 @@ paper1-pbt/
 
 ---
 
-## 📚 Citation (examples)
-- **Manuscript:** *Towards a Personalised Basal Tuner: Imputing Basal Insulin in People with T1DM* (Paper 1).
-- **Software (this repository):** Gasca García, D. *PBT — Paper 1 Pipeline (v1.0.0)*. Zenodo/GitHub. DOI: **[add DOI]**.
+## 📚 Citation
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17392921.svg)](https://doi.org/10.5281/zenodo.17392921)
+
+- **Manuscript:** *Towards a Personalised Basal Tuner: Imputing Basal Insulin in People with T1DM* (Paper 1).
+- **Software (this repository):** Gasca García, D. **PBT — Paper 1 Pipeline (v1.0.0)**. Zenodo/GitHub. DOI: https://doi.org/10.5281/zenodo.17392921
+
+### BibTeX
+```bibtex
+@software{gasca_garcia_pbt_paper1_2025_v1_0_0,
+  author  = {Gasca García, Daniel},
+  title   = {PBT — Paper 1 Pipeline},
+  version = {v1.0.0},
+  year    = {2025},
+  doi     = {10.5281/zenodo.17392921},
+  url     = {https://doi.org/10.5281/zenodo.17392921}
+}
 ---
 
 ## 📝 License

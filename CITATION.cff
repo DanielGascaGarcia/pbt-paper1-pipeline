@@ -7,7 +7,7 @@ authors:
     given-names: "Daniel"
 date-released: "2025-10-19"
 license: "MIT"
-doi: "10.5281/zenodo.XXXXXXX"
+doi: "10.5281/zenodo.17392921"
 preferred-citation:
   type: software
   title: "PBT - Paper 1 Pipeline"
