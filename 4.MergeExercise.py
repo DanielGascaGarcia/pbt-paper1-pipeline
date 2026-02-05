@@ -1,4 +1,4 @@
-#Code: 4.PreprocessingExercise.py
+#Code: 4.MergeExercise.py
 #Description: Creating  Exercise files to be merged.
 #Created 5th July 2023
 #Author: mbaxdg6

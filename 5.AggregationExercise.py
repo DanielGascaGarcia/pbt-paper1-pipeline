@@ -1,4 +1,4 @@
-#Code: 6.FillGapsExercise.py
+#Code: 6.AggregationExercise.py
 #Description: .
 #Created 5th July 2023
 #Author: mbaxdg6

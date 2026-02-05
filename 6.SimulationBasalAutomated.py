@@ -1,4 +1,4 @@
-#Code: S.SimulationBasal.py
+#Code: S.SimulationBasalAutomated.py
 #Description: Simulation of basal values.
 #Created 22nd March 2022
 #Author: mbaxdg6
