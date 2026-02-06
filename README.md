@@ -58,7 +58,7 @@ Run the orchestrator `17.ScriptforTestExperiment1.py`. It calls the scripts in t
 16. `7.InterpolationBGHourly.py`
 17. `8.RelativeChange.py`
 18. `9.Boxplot.py`
-19. `10.PivotGeneratormedians.py`
+19. `10.PivotGeneratorMedians.py`
 20. `11.MergeRChBasal.py`
 
 ---
@@ -126,20 +126,20 @@ paper1-pbt/
 
 ## 📚 Citation
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17392921.svg)](https://doi.org/10.5281/zenodo.17392921)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17392920.svg)](https://doi.org/10.5281/zenodo.17392920   )
 
 - **Manuscript:** *Towards a Personalised Basal Tuner: Imputing Basal Insulin in People with T1DM* (Paper 1).
-- **Software (this repository):** Gasca García, D. **PBT — Paper 1 Pipeline (v1.0.0)**. Zenodo/GitHub. DOI: https://doi.org/10.5281/zenodo.17392921
+- **Software (this repository):** Gasca García, D. **PBT — Paper 1 Pipeline (v1.0.2)**. Zenodo/GitHub. DOI: https://doi.org/10.5281/zenodo.17392920   
 
 ### BibTeX
 ```bibtex
-@software{gasca_garcia_pbt_paper1_2025_v1_0_0,
+@software{gasca_garcia_pbt_paper1_2025_v1_0_2,
   author  = {Gasca García, Daniel},
   title   = {PBT — Paper 1 Pipeline},
   version = {v1.0.0},
   year    = {2025},
-  doi     = {10.5281/zenodo.17392921},
-  url     = {https://doi.org/10.5281/zenodo.17392921}
+  doi     = {10.5281/zenodo.17392920   },
+  url     = {https://doi.org/110.5281/zenodo.17392920}
 }
 ---
 
