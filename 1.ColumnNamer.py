@@ -29,11 +29,13 @@ elemList = [];
 for child in ohioRoot:
     print(child.tag, child.attrib);
     elemList.append(child.tag);
-
-#Duplicities are removed
+# -----------------------------------------------------------#
+#                Duplicities are removed
+# -----------------------------------------------------------#
 elemList = list(set(elemList));
-
-# Printing the results
+# -----------------------------------------------------------#
+#                     Printing the results
+# -----------------------------------------------------------#
 print(len(elemList));
 
 
