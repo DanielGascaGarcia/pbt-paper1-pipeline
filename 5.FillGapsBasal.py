@@ -6,12 +6,14 @@
 
 import pandas as pd
 import os
-
 import globals
+
+# -----------------------------------------------------------#
+# --- Configurable global variable ---
+# -----------------------------------------------------------#
 id=globals.id;
+path2=globals.path2;
 
-
-path2='C:/OhioDataset/ExploratoryAnalysisData/OhioT1DM/2018/parsedTexts/';
 fileToRead="BasalLeftJoined"+str(id)+".csv";
 fileToSave="BasalImputed"+str(id)+".csv";
 

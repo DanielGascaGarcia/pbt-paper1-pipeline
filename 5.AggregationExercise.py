@@ -8,8 +8,9 @@ import numpy as np
 import datetime 
 import os
 import globals
-
+# -----------------------------------------------------------#
 # --- Configurable global variable ---
+# -----------------------------------------------------------#
 id = globals.id;
 path2=globals.path2;
 fileToRead="ExerciseLeftJoined"+str(id)+".csv";

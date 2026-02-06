@@ -13,7 +13,9 @@ import csv
 import pandas as pd
 import globals
 
+# -----------------------------------------------------------#
 # --- Configurable global variable ---
+# -----------------------------------------------------------#
 id = globals.id;
 fileToRead=str(id)+"-ws-training";
 path1=globals.path1;

@@ -9,8 +9,9 @@ from itertools import groupby
 import xml.etree.ElementTree as ET
 import csv
 import globals
-
+# -----------------------------------------------------------#
 # --- Configurable global variable ---
+# -----------------------------------------------------------#
 id = globals.id;
 fileToRead=str(id)+"-ws-training";
 path1=globals.path1;
