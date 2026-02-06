@@ -1,3 +1,4 @@
+#Code: 5.MergeBGClean.py
 #Description: Merge of values.
 #Created 11th April 2023
 #Author: mbaxdg6
@@ -12,7 +13,9 @@ from matplotlib import pyplot as plt
 import numpy as np
 import globals
 
-# --- Configurable global variable ---
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
 id = globals.id;
 
 # Parameters

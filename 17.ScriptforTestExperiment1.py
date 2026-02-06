@@ -1,5 +1,5 @@
 #Code: 17.ScriptforTestExperiment1.py
-#Description: Creating pivot table for merge.
+#Description: Script to run the pipeline.
 #Created 5th July 2023
 #Author: mbaxdg6 
 
@@ -26,7 +26,7 @@ scripts = [
     "7.InterpolationBGHourly.py",
     "8.RelativeChange.py",
     "9.Boxplot.py",
-    "10.PivotGeneratormedians.py",
+    "10.PivotGeneratorMedians.py",
     "11.MergeRChBasal.py",
 
 ]

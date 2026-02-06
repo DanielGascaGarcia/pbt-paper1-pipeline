@@ -1,3 +1,4 @@
+#Code: 11.MergeRChBasal.py
 #Description: Merge of values.
 #Created 10th May 2023
 #Author: mbaxdg6
@@ -11,7 +12,9 @@ import matplotlib
 matplotlib.rcParams.update({'font.size': 15})
 import globals
 
-# --- Configurable global variable ---
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
 id = globals.id;
 path2=globals.path2;
 fileToRead1="BGHourRelativeChange"+str(id);

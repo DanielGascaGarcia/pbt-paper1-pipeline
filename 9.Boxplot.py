@@ -1,3 +1,4 @@
+#Code: 9.Boxplot.py
 #Description: Generating pivot with relative changes.
 #Created 10th May 2023
 #Author: mbaxdg6
@@ -15,6 +16,9 @@ import seaborn as sns
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 import globals
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
 id=globals.id;
 path2=globals.path2;
 fileToRead="BGHourRelativeChange"+str(id);

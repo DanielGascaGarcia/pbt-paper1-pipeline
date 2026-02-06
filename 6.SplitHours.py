@@ -1,3 +1,4 @@
+#Code: 6.SplitHours.py
 #Description: Split values in different files.
 #Created 19th April 2023
 #Author: mbaxdg6
@@ -12,12 +13,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 import csv
 import globals
+
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
+
 id=globals.id;
-# id=588;
-# id="adolescent#006";
-# id="child#010";
-# id="adult#001";
-path2='C:/OhioDataset/ExploratoryAnalysisData/OhioT1DM/2018/parsedTexts/';
+path2=globals.path2;
+
 fileToRead="BGwNMLeftJoined"+str(id)+".csv";
 fileToSave="BGHour"+str(id);
 

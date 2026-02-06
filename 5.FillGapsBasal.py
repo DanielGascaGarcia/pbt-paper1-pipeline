@@ -9,7 +9,7 @@ import os
 import globals
 
 # -----------------------------------------------------------#
-# --- Configurable global variable ---
+#              Configurable variables
 # -----------------------------------------------------------#
 id=globals.id;
 path2=globals.path2;

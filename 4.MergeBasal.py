@@ -1,3 +1,4 @@
+#Code: 4.MergeBasal
 #Description: Merge of values.
 #Created 22nd March 2023
 #Author: mbaxdg6
@@ -8,7 +9,7 @@ import os
 import globals
 
 # -----------------------------------------------------------#
-# --- Configurable global variable ---
+#              Configurable variables
 # -----------------------------------------------------------#
 id = globals.id;
 path2=globals.path2;

@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 import csv
 import globals
 # -----------------------------------------------------------#
-# --- Configurable global variable ---
+#              Configurable variables 
 # -----------------------------------------------------------#
 id = globals.id;
 fileToRead=str(id)+"-ws-training";
