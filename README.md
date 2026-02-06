@@ -139,7 +139,7 @@ paper1-pbt/
   version = {v1.0.0},
   year    = {2025},
   doi     = {10.5281/zenodo.17392920   },
-  url     = {https://doi.org/110.5281/zenodo.17392920}
+  url     = {https://doi.org/10.5281/zenodo.17392920}
 }
 ---
 
