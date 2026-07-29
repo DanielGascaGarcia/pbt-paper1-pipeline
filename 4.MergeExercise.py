@@ -1,4 +1,4 @@
-#Code: 4.MergeExercise.py
+#Code: 4.PreprocessingExercise.py
 #Description: Creating  Exercise files to be merged.
 #Created 5th July 2023
 #Author: mbaxdg6
@@ -40,7 +40,7 @@ listVariables=['glucose_level',
 filesExercise=[];
 for file in os.listdir(path2):
     if file.startswith(listVariables[16]+str(fileToRead)+str(' ')):
-        # print(file); 
+        print(file); 
         filesExercise.append(file);
 print(filesExercise);
 

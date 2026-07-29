@@ -1,7 +1,11 @@
-# Data / intermediates / outputs
-data/*
-work/*
-outputs/*
+# Input data and intermediates (not distributed)
+raw/
+processed/
+
+# Figures are reproduced by running the pipeline; the tables under
+# results/tables/ ARE tracked, so the reported values can be checked
+# without access to the OhioT1DM dataset.
+results/figures/
 
 # Python
 __pycache__/
@@ -10,7 +14,13 @@ __pycache__/
 *.pyd
 *.egg-info/
 .venv/
+venv/
+env/
 .env
+
+# Editors
+.vscode/
+.idea/
 
 # OS
 .DS_Store

@@ -1,4 +1,3 @@
-#Code: 11.MergeRChBasal.py
 #Description: Merge of values.
 #Created 10th May 2023
 #Author: mbaxdg6
@@ -9,17 +8,25 @@ import os
 from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib
-matplotlib.rcParams.update({'font.size': 15})
+matplotlib.rcParams.update({'font.size': 11})
 import globals
 
 # --- Configurable global variable ---
 id = globals.id;
 path2=globals.path2;
+path3=globals.path3;
+os.makedirs(path3, exist_ok=True);
 fileToRead1="BGHourRelativeChange"+str(id);
 fileToRead2="BasalSimulated"+str(id);
 fileToRead3="ExerciseImputed"+str(id);
 fileToSave="ComparisonJoined"+str(id);
 Sampling_time=0.1;
+
+# -----------------------------------------------------------#
+# Unit conversion. Source values are in mg/dL.
+# Factor lives in globals.py so every script shares one value.
+# -----------------------------------------------------------#
+MGDL_TO_MMOL = globals.MGDL_TO_MMOL;
 
 # -----------------------------------------------------------#
 # reading two csv files
@@ -98,8 +105,9 @@ print(colordf2);
 # -----------------------------------------------------------#
 #                    Graph in general
 # -----------------------------------------------------------#
-fig, (ax1,ax2,ax3)= plt.subplots(nrows=3, sharex=True);
-plt.suptitle("Blood Glucose Dynamic, ID: "+str(id));
+fig, (ax1,ax2,ax3)= plt.subplots(nrows=3, sharex=True, figsize=(12, 9), constrained_layout=True);
+if globals.FIGURE_TITLES:
+    plt.suptitle("Blood Glucose Dynamic, ID: "+str(id));
 # -----------------------------------------------------------#
 #                    Graph Insulin
 # -----------------------------------------------------------#
@@ -113,14 +121,14 @@ major_ticks = np.arange(0, 24, 5)
 minor_ticks = np.arange(0, 24, 1)
 ax1.set_xticks(major_ticks)
 ax1.set_xticks(minor_ticks, minor=True)
-ax1.legend(bbox_to_anchor = (0.786, 1.035), loc='upper left');
+ax1.legend(loc='upper right', fontsize=9, framealpha=0.9);
 # -----------------------------------------------------------#
 #              Graph Relative Blood Glucose
 # -----------------------------------------------------------#
-T_MedRelChange_=[i/18.0182  for i in T_MedRelChange]
+T_MedRelChange_=[i  for i in T_MedRelChange]
 ax2.plot(T_Key,T_MedRelChange_, 'o--',color="Black");
 ax2.axhline(linewidth=2, color='Black');
-ax2.set_ylabel("BG Rel. Change \n (mg/dL) (mmol/L)");
+ax2.set_ylabel("BG Rel. Change \n (mg/dL)");
 ax2.grid(which='major', color='#DDDDDD', linewidth=0.8);
 ax2.grid(which='minor', color='#DDDDDD', linestyle=':', linewidth=0.5);
 
@@ -182,7 +190,7 @@ else:
 
 print(order);
 
-ax2.legend([handles[idx] for idx in order],[labels[idx] for idx in order],bbox_to_anchor = (0.875, 1.035), loc='upper left');
+ax2.legend([handles[idx] for idx in order],[labels[idx] for idx in order],loc='upper right', fontsize=9, framealpha=0.9);
 
 
 # -----------------------------------------------------------#
@@ -249,11 +257,26 @@ try:
         else:
             order.append(2);
 
-        ax3.legend([handles[idx] for idx in order],[labels[idx] for idx in order],bbox_to_anchor = (0.9, 1.035), loc='upper left');
+        ax3.legend([handles[idx] for idx in order],[labels[idx] for idx in order],loc='upper right', fontsize=9, framealpha=0.9);
 except:
-        ax3.legend(bbox_to_anchor = (0.925, 1.035), loc='upper left');
+        ax3.legend(loc='upper right', fontsize=9, framealpha=0.9);
 
+# -----------------------------------------------------------#
+#   Secondary axis in mmol/L on the BG panel (ax2 only).
+#   Rescale only: the data is drawn once on ax2. Placed here so
+#   it inherits the final y limits.
+# -----------------------------------------------------------#
+ax2b = ax2.twinx();
+ax2b.set_ylim([v * MGDL_TO_MMOL for v in ax2.get_ylim()]);
+ax2b.set_ylabel("BG Rel. Change \n (mmol/L)");
+ax2b.grid(False);
+
+# -----------------------------------------------------------#
+#              Save figure
+# -----------------------------------------------------------#
+figNames = {559:['Figure6'], 563:['Figure7'], 570:['Figure8'], 575:['Figure9'], 588:['Figure10','Figure2'], 591:['Figure11']};
+for name in figNames.get(id, [str(id)]):
+    out = path3 + name + '.png';
+    plt.savefig(out, dpi=300, bbox_inches='tight');
+    print("Saved:", os.path.abspath(out));
 plt.show();
-
-
-

@@ -1,4 +1,3 @@
-#Code: 9.BoxPlot.py
 #Description: Generating pivot with relative changes.
 #Created 10th May 2023
 #Author: mbaxdg6
@@ -18,8 +17,24 @@ matplotlib.rcParams.update({'font.size': 18})
 import globals
 id=globals.id;
 path2=globals.path2;
+path3=globals.path3;
+os.makedirs(path3, exist_ok=True);
 fileToRead="BGHourRelativeChange"+str(id);
 fileToSave="Boxplot"+str(id);
+
+# -----------------------------------------------------------#
+# Unit conversion. Source values are in mg/dL.
+# Factor lives in globals.py so every script shares one value.
+# -----------------------------------------------------------#
+MGDL_TO_MMOL = globals.MGDL_TO_MMOL;
+
+# -----------------------------------------------------------#
+# Figure titles. Journals put the title in the caption, not in
+# the image, so this is off for the submitted figures.
+# -----------------------------------------------------------#
+def figTitle(text):
+    if globals.FIGURE_TITLES:
+        plt.title(text);
 
 # -----------------------------------------------------------#
 # Obtain the last values
@@ -40,18 +55,34 @@ for i in range(24):
     total1["["+str(i)+"-"+str(i+1)+"]"]=data["["+str(i)+str("-")+str(i+1)+"]"];
 total1.to_csv(str(path2)+str(fileToSave)+str(0)+str("-")+str(24)+"total"+".csv",index=False);
 
+
 # -----------------------------------------------------------#
 # Plot the dataframe
 # -----------------------------------------------------------#
+plt.figure(figsize=(12, 9));
 plt.grid();
 pd.DataFrame.boxplot(total, vert = False);
 # -----------------------------------------------------------#
 # Display the plot
 # -----------------------------------------------------------#
-plt.xlabel("Blood Glucose Relative Change \n (mg/dL) (mmol/L)");
+figTitle("Blood Glucose Relative Change Behaviour, ID: "+str(id));
+plt.xlabel("Blood glucose relative change (mg/dL)");
 plt.ylabel("Hours");
-plt.axvspan(-2*18.0182, 2*18.0182, color="blue", alpha=0.2)
-plt.title("Blood Glucose Relative Change Behaviour, ID: "+str(id));
+plt.axvspan(-2/MGDL_TO_MMOL, 2/MGDL_TO_MMOL, color="blue", alpha=0.2)
+
+# -----------------------------------------------------------#
+# Secondary axis in mmol/L. The boxplot is horizontal, so the
+# value axis is X: use twiny(). Rescale only, data drawn once.
+# -----------------------------------------------------------#
+ax = plt.gca();
+ax2 = ax.twiny();
+ax2.set_xlim([v * MGDL_TO_MMOL for v in ax.get_xlim()]);
+ax2.set_xlabel("Blood glucose relative change (mmol/L)");
+ax2.grid(False);
+
+if id == globals.idG:
+    out = path3 + 'Figure4.png';
+    plt.savefig(out, dpi=300, bbox_inches='tight');
+    print("Saved:", os.path.abspath(out));
+
 plt.show();
-
-

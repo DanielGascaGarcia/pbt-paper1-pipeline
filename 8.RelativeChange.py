@@ -1,4 +1,3 @@
-#Code: 8.RelativeChange.py
 #Description: Computation of relative changes.
 #Created 19th April 2023
 #Author: mbaxdg6
@@ -62,7 +61,7 @@ for i in range(24):
             dt1=last_val;
         except:
             # print("No key");
-            dt1=" ";
+            dt1="";
         dt.append(dt1); 
     dt=pd.DataFrame(dt, columns=['Last_values'])  
     dt.to_csv(str(path2)+str(fileToSave)+str(i)+str("To")+str(i+1)+"lastValues"+".csv",index=False);

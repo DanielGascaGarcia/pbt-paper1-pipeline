@@ -1,0 +1,10 @@
+Metric,Value
+Participants,6.0
+Hours (24 x n),144.0
+Too little insulin,47.0
+Too much insulin,80.0
+Optimal,15.0
+Missing,2.0
+"Off-target %, all hours",88.2
+"Off-target %, excl. missing",89.4
+Optimal hours per day per participant,2.5

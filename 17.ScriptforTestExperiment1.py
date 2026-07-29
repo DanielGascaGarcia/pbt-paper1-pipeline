@@ -1,14 +1,11 @@
-#Code: 17.ScriptforTestExperiment1.py
-#Description: Creating pivot table for merge.
-#Created 5th July 2023
-#Author: mbaxdg6 
-
 import subprocess
+import sys
+import os
 import globals
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 scripts = [
-    "globals.py",
     "0.Parser.py",
     "1.ColumnNamer.py",
     "2.Disaggregator.py",
@@ -28,16 +25,39 @@ scripts = [
     "9.Boxplot.py",
     "10.PivotGeneratormedians.py",
     "11.MergeRChBasal.py",
-
 ]
 
-for script in scripts:
+for patient_id in globals.ids:
+    print(f"\n========== Running pipeline for ID {patient_id} ==========\n")
+    env = os.environ.copy()
+    env["PATIENT_ID"] = str(patient_id)
+
+    for script in scripts:
+        try:
+            print(f"Running {script} for ID {patient_id}...")
+            subprocess.run([sys.executable, script], check=True, env=env, cwd=HERE)
+            print(f"{script} completed successfully.\n")
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred while running {script} for ID {patient_id}: {e}")
+            break
+
+
+final_scripts = [
+    "G.GraphResults.py",
+    "G.Graph3DCleanBG.py",
+    "G.Graph3DPeaksRemoved.py",
+    "G.Graph3DComplete.py",
+    "S.SimulationAbsortion.py",
+    "G.ComposeFigure3.py",
+]
+
+env_final = os.environ.copy()
+env_final["PATIENT_ID"] = str(globals.idG)
+
+for script in final_scripts:
+    print(f"\n========== Running {script} (all IDs) ==========\n")
     try:
-        print(f" Current id is: "+ str(globals.id))
-        print(f"Running {script}...")
-        subprocess.run(["python", script], check=True)
+        subprocess.run([sys.executable, script], check=True, env=env_final, cwd=HERE)
         print(f"{script} completed successfully.\n")
     except subprocess.CalledProcessError as e:
-        print(f"An error occurred while running {script}: clear{e}")
-        break
-
+        print(f"An error occurred while running {script}: {e}")

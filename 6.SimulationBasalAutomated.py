@@ -1,4 +1,4 @@
-#Code: S.SimulationBasalAutomated.py
+#Code: S.SimulationBasal.py
 #Description: Simulation of basal values.
 #Created 22nd March 2022
 #Author: mbaxdg6
@@ -23,11 +23,7 @@ id=globals.id;
 # Parameters
 # -----------------------------------------------------------#
 
-# id=588;
-# id="adolescent#006";
-# id="child#010";
-# id="adult#001";
-path2='C:/OhioDataset/ExploratoryAnalysisData/OhioT1DM/2018/parsedTexts/';
+path2=globals.path2;
 fileToRead="BasalImputed"+str(id)+".csv";
 fileToSave="BasalSimulated"+str(id)+".csv";
 

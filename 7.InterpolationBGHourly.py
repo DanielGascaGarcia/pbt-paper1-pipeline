@@ -1,4 +1,3 @@
-#Code: 7.InterporationBGHourly.py
 #Description: interpolate values.
 #Created 19th April 2023
 #Author: mbaxdg6

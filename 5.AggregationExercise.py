@@ -1,4 +1,4 @@
-#Code: 6.AggregationExercise.py
+#Code: 6.FillGapsExercise.py
 #Description: .
 #Created 5th July 2023
 #Author: mbaxdg6
@@ -17,14 +17,14 @@ fileToSave="ExerciseImputed"+str(id)+".csv";
 dt = datetime.datetime(2010, 12, 1);
 end = datetime.datetime(2010, 12, 1, 23, 59, 59);
 step = datetime.timedelta(minutes=60);
-# print(str(path2)+fileToRead); 
+print(str(path2)+fileToRead); 
 secArray=[];
 #----------------------------------------------------------------------------------
 # Generate aggregation
 #----------------------------------------------------------------------------------
 data= pd.read_csv(str(path2)+fileToRead);
 data["Key"]= pd.to_datetime(data["Key"])
-result = data.resample('60T', on="Key").sum();
+result = data.resample('60min', on="Key").sum();
 while dt < end:
         secArray.append(dt.strftime('%H:%M:%S'));
         dt += step;

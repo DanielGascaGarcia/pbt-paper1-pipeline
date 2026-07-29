@@ -1,6 +1,17 @@
-pandas>=1.5
-numpy>=1.23
-scipy>=1.9
-matplotlib>=3.6
-tqdm>=4.64
-python-dateutil>=2.8
+# PBT pipeline (Paper 1) - direct dependencies
+# Repository: https://github.com/DanielGascaGarcia/pbt-paper1-pipeline
+#
+# Environment in which the results reported in the current version of the
+# manuscript reproduce. Python 3.9.12, conda, Windows.
+#
+# Install with:
+#   conda create -n pbt python=3.9.12
+#   conda activate pbt
+#   pip install -r requirements.txt
+
+numpy==2.0.2
+pandas==2.2.2
+scipy==1.13.1
+matplotlib==3.9.2
+seaborn==0.13.2
+pillow==9.0.1
