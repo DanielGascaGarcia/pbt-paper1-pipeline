@@ -6,9 +6,13 @@
 
 import pandas as pd
 import os
-
 import globals
+
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
 id=globals.id;
+path2=globals.path2;
 
 
 path2=globals.path2;

@@ -1,4 +1,4 @@
-#Code: S.SimulationBasal.py
+#Code: 6.SimulationBasalAutomated.py
 #Description: Simulation of basal values.
 #Created 22nd March 2022
 #Author: mbaxdg6
@@ -19,9 +19,6 @@ matplotlib.rcParams.update({'font.size': 12})
 import globals
 id=globals.id;
 
-# -----------------------------------------------------------#
-# Parameters
-# -----------------------------------------------------------#
 
 path2=globals.path2;
 fileToRead="BasalImputed"+str(id)+".csv";

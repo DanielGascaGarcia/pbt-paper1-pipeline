@@ -1,3 +1,4 @@
+#Code: 8.RelativeChange.py
 #Description: Computation of relative changes.
 #Created 19th April 2023
 #Author: mbaxdg6
@@ -13,6 +14,9 @@ import numpy as np
 import csv
 pd.options.mode.chained_assignment = None  # default='warn'
 import globals
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
 id=globals.id;
 path2=globals.path2;
 fileToRead="BGHourInterpolated"+str(id);

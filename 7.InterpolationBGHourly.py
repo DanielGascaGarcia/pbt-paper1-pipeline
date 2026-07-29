@@ -1,3 +1,4 @@
+#Code: 7.InterpolationBGhourly.py
 #Description: interpolate values.
 #Created 19th April 2023
 #Author: mbaxdg6
@@ -14,7 +15,9 @@ import csv
 import globals
 id=globals.id;
 
-
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
 path2=globals.path2;
 fileToRead="BGHour"+str(id);
 fileToSave="BGHourInterpolated"+str(id);

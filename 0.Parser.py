@@ -12,8 +12,9 @@ import os
 import globals
 # 540,544,552,567,584,596,559,563,570,575,588,591
 keys={'ts','tend','tbegin','ts_begin','ts_end'};
-
-# --- Configurable global variable ---
+# -----------------------------------------------------------#
+#              Configurable variables 
+# -----------------------------------------------------------#
 id = globals.id;
 fileToRead=str(id)+"-ws-training";
 path1=globals.path1;
@@ -26,13 +27,14 @@ elemList = [];
 for child in ohioRoot:
     print(child.tag, child.attrib);
     elemList.append(child.tag);
-
-#Duplicities are removed
+# -----------------------------------------------------------#
+#               Duplicities are removed
+# -----------------------------------------------------------#
 elemList = list(set(elemList));
-# Printing the results
+# -----------------------------------------------------------#
+#                   Printing the results
+# -----------------------------------------------------------#
 print(len(elemList));
-
-
 
 for x in range(len(elemList)):
     open(str(path2)+str(ohioRoot[x].tag)+str(fileToRead)+".csv", 'w').close();

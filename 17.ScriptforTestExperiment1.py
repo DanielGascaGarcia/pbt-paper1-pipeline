@@ -23,7 +23,7 @@ scripts = [
     "7.InterpolationBGHourly.py",
     "8.RelativeChange.py",
     "9.Boxplot.py",
-    "10.PivotGeneratormedians.py",
+    "10.PivotGeneratorMedians.py",
     "11.MergeRChBasal.py",
 ]
 

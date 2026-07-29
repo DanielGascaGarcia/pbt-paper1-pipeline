@@ -1,4 +1,4 @@
-#Code: 6.FillGapsExercise.py
+#Code: 5.AggregationExercise.py
 #Description: .
 #Created 5th July 2023
 #Author: mbaxdg6
@@ -8,8 +8,9 @@ import numpy as np
 import datetime 
 import os
 import globals
-
-# --- Configurable global variable ---
+# -----------------------------------------------------------#
+#              Configurable variables
+# -----------------------------------------------------------#
 id = globals.id;
 path2=globals.path2;
 fileToRead="ExerciseLeftJoined"+str(id)+".csv";
