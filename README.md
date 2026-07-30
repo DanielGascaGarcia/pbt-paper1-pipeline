@@ -27,13 +27,16 @@ of the manuscript.
 - Final merge for multi-panel figures (ΔBG, basal / active insulin, activity)
 
 The analysis covers the six OhioT1DM participants who reported physical
-activity — 559, 563, 570, 575, 588 and 591 — over a 45-day retrospective window.
+activity — 559, 563, 570, 575, 588 and 591 — over a 45-day retrospective
+window, using the training split of the dataset.
 
 ---
 
 ## Inputs
 
-- OhioT1DM per-participant XML/CSV files, placed in `raw/`
+- OhioT1DM per-participant XML files — **training split only**
+  (`{id}-ws-training.xml`) — placed in `raw/`. The test split is not used at
+  any stage.
 - Intermediate files produced by the pipeline itself, written to `processed/`
 - Configuration in `globals.py`
 
@@ -110,9 +113,8 @@ from the parser** for any run intended to reproduce the reported values.
 
 ### Aggregate scripts (run once, after the per-participant loop)
 
-`G.GraphResults.py` → `G.GraphBoxPlots.py` → `G.Graph3DCleanBG.py` →
-`G.Graph3DPeaksRemoved.py` → `G.Graph3DComplete.py` →
-`S.SimulationAbsortion.py` → `G.ComposeFigure3.py`
+`G.GraphResults.py` → `G.Graph3DCleanBG.py` → `G.Graph3DPeaksRemoved.py` →
+`G.Graph3DComplete.py` → `S.SimulationAbsortion.py` → `G.ComposeFigure3.py`
 
 These are called by the orchestrator with `PATIENT_ID` set to `idG`.
 `G.ComposeFigure3.py` runs last because it reads the three panel PNGs written
