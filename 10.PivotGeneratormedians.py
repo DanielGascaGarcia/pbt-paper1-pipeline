@@ -1,5 +1,4 @@
-#Code: 10.PivotGenerationMedians.py
-#Description: Pivot generator medians.
+#Description: Computation of relative changes.
 #Created 19th April 2023
 #Author: mbaxdg6
 
@@ -14,11 +13,8 @@ import numpy as np
 import csv
 import seaborn as sns
 warnings.simplefilter(action='ignore', category=FutureWarning)
-import globals
 
-# -----------------------------------------------------------#
-#              Configurable variables
-# -----------------------------------------------------------#
+import globals
 id=globals.id;
 path2=globals.path2;
 fileToRead="Boxplot"+str(id);

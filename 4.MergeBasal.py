@@ -1,4 +1,3 @@
-#Code: 4.MergeBasal
 #Description: Merge of values.
 #Created 22nd March 2023
 #Author: mbaxdg6
@@ -8,9 +7,7 @@ import pandas as pd
 import os
 import globals
 
-# -----------------------------------------------------------#
-#              Configurable variables
-# -----------------------------------------------------------#
+# --- Configurable global variable ---
 id = globals.id;
 path2=globals.path2;
 fileToRead=str(id)+"-ws-training";

@@ -9,9 +9,8 @@ from itertools import groupby
 import xml.etree.ElementTree as ET
 import csv
 import globals
-# -----------------------------------------------------------#
-#              Configurable variables 
-# -----------------------------------------------------------#
+
+# --- Configurable global variable ---
 id = globals.id;
 fileToRead=str(id)+"-ws-training";
 path1=globals.path1;
@@ -25,13 +24,11 @@ elemList = [];
 for child in ohioRoot:
     print(child.tag, child.attrib);
     elemList.append(child.tag);
-# -----------------------------------------------------------#
+
 #Duplicities are removed
-# -----------------------------------------------------------#
 elemList = list(set(elemList));
-# -----------------------------------------------------------#
+
 # Printing the results
-# -----------------------------------------------------------#
 print(len(elemList));
 
 for i in range(len(elemList)):

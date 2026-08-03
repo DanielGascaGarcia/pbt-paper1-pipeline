@@ -1,4 +1,4 @@
-#Code: 4.MergeExercise.py
+#Code: 4.PreprocessingExercise.py
 #Description: Creating  Exercise files to be merged.
 #Created 5th July 2023
 #Author: mbaxdg6
@@ -8,9 +8,7 @@ import datetime
 import os
 import globals
 
-# -----------------------------------------------------------#
-#              Configurable variables
-# -----------------------------------------------------------#
+# --- Configurable global variable ---
 id = globals.id;
 path2=globals.path2;
 fileToRead=str(id)+"-ws-training";

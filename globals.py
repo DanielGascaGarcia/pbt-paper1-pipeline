@@ -14,12 +14,30 @@ import matplotlib
 matplotlib.use("Agg")
 
 # -----------------------------------------------------------#
+# Demo mode
+# -----------------------------------------------------------#
+# The OhioT1DM dataset cannot be redistributed, so the repository ships a
+# generator of synthetic files in the same schema instead. With DEMO = True
+# the orchestrator regenerates those files and runs the pipeline on them,
+# which lets anyone verify that the code executes end to end without access
+# to the real data.
+#
+# Demo mode reads and writes a SEPARATE directory (sample_data/). It never
+# touches raw/, so leaving this set to True by accident cannot overwrite
+# data obtained under the Data Use Agreement.
+#
+# Results produced in demo mode are meaningless. Do not compare them with
+# anything reported in the manuscript.
+DEMO = True
+
+# -----------------------------------------------------------#
 # Paths
 # -----------------------------------------------------------#
 # Resolved relative to this file, so the repository runs as cloned and a
 # script can also be run on its own from any working directory.
 #
 #   path1  raw        input data as downloaded / parsed from OhioT1DM
+#                     (sample_data/ when DEMO is True)
 #   path2  processed  intermediate CSVs passed between pipeline steps
 #   path3  figures    final figures for the manuscript
 #   path4  tables     final tables for the manuscript
@@ -27,11 +45,11 @@ matplotlib.use("Agg")
 # NOTE: several steps collect their inputs by listing whatever per-day
 # files are present in path2, rather than regenerating a known list. A
 # leftover file from an earlier run is therefore picked up as if it
-# belonged to the current one. Clear path2 and re-run from the parser for
-# any run intended to reproduce the reported values.
+# belonged to the current one. The orchestrator clears path2 before every
+# run for this reason; clear it by hand if you run steps individually.
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-path1 = os.path.join(HERE, 'raw') + '/'
+path1 = os.path.join(HERE, 'sample_data' if DEMO else 'raw') + '/'
 path2 = os.path.join(HERE, 'processed') + '/'
 path3 = os.path.join(HERE, 'results', 'figures') + '/'
 path4 = os.path.join(HERE, 'results', 'tables') + '/'
@@ -50,13 +68,27 @@ id = int(os.environ.get("PATIENT_ID", 559))
 
 # Participants included in this experiment: the six OhioT1DM subjects that
 # report self-reported activity. Used by the aggregation scripts that plot
-# all participants at once (G.GraphResults.py, G.GraphBoxPlots.py).
+# all participants at once (G.GraphResults.py, G.GraphBoxPlots.py), and by
+# the orchestrator to decide which synthetic files to generate in demo mode.
 ids = [559, 563, 570, 575, 588, 591]
 
 # Participant shown as the worked example in the manuscript. Scripts that
 # produce a single-subject illustrative figure check `id == idG` before
 # saving, so the figure is only written once per full run.
 idG = 588
+
+# Days per participant generated in demo mode. The real dataset provides
+# about 45 days per participant; a short synthetic run is enough to verify
+# that every step executes, but the figures it produces are sparse and the
+# last day is always incomplete, because the midnight-overflow trimming
+# needs the following day to close.
+DEMO_DAYS = 5
+
+# Seed for the synthetic generator, so a demo run is reproducible. The
+# generator derives a per-participant seed from this value, and carries the
+# same number as its own default, so it produces identical files whether it
+# is launched by the orchestrator or on its own from the command line.
+DEMO_SEED = 20260801
 
 # -----------------------------------------------------------#
 # Figure formatting

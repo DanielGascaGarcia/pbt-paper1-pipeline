@@ -1,4 +1,4 @@
-#Code: 3.PivotGenerator.py
+#Code: 3.PivotGeneratorBasal.py
 #Description: Creating pivot table for merge.
 #Created 22ND March 2023
 #Author: mbaxdg6

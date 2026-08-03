@@ -1,4 +1,3 @@
-#Code: 9.Boxplot.py
 #Description: Generating pivot with relative changes.
 #Created 10th May 2023
 #Author: mbaxdg6
@@ -16,9 +15,6 @@ import seaborn as sns
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 import globals
-# -----------------------------------------------------------#
-#              Configurable variables
-# -----------------------------------------------------------#
 id=globals.id;
 path2=globals.path2;
 path3=globals.path3;
@@ -43,7 +39,7 @@ def figTitle(text):
 # -----------------------------------------------------------#
 # Obtain the last values
 # -----------------------------------------------------------#
-total = pd.DataFrame(index=range(len(pd.read_csv(str(path2)+str(fileToRead)+str(0)+str("To")+str(1)+".csv").columns)-2));
+total = pd.DataFrame(index=range(len(pd.read_csv(str(path2)+str(fileToRead)+str(0)+str("To")+str(1)+".csv").columns)-1));
 for i in reversed(range(24)):
     data = pd.read_csv(str(path2)+str(fileToRead)+str(i)+str("To")+str(i+1)+"lastValues"+".csv");
     data.rename(columns = {'Last_values':str(i)+str("-")+str(i+1)}, inplace = True);
@@ -51,7 +47,7 @@ for i in reversed(range(24)):
 # -----------------------------------------------------------#
 # Saving in the correct order
 # -----------------------------------------------------------#
-total1 = pd.DataFrame(index=range(len(pd.read_csv(str(path2)+str(fileToRead)+str(0)+str("To")+str(1)+".csv").columns)-2));
+total1 = pd.DataFrame(index=range(len(pd.read_csv(str(path2)+str(fileToRead)+str(0)+str("To")+str(1)+".csv").columns)-1));
 for i in range(24):
     data = pd.read_csv(str(path2)+str(fileToRead)+str(i)+str("To")+str(i+1)+"lastValues"+".csv");
     data.rename(columns = {'Last_values':"["+str(i)+str("-")+str(i+1)+"]"}, inplace = True);

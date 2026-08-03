@@ -1,4 +1,3 @@
-#Code: 11.MergeRChBasal.py
 #Description: Merge of values.
 #Created 10th May 2023
 #Author: mbaxdg6
@@ -12,9 +11,7 @@ import matplotlib
 matplotlib.rcParams.update({'font.size': 11})
 import globals
 
-# -----------------------------------------------------------#
-#              Configurable variables
-# -----------------------------------------------------------#
+# --- Configurable global variable ---
 id = globals.id;
 path2=globals.path2;
 path3=globals.path3;

@@ -1,4 +1,10 @@
+#Code: 17.ScriptforTestExperiment1.py
+#Description: Orchestrator for the experiment 1 pipeline. Runs every step in
+#             order, once per participant, then the aggregation scripts.
+#Author: mbaxdg6
+
 import subprocess
+import shutil
 import sys
 import os
 import globals
@@ -23,9 +29,82 @@ scripts = [
     "7.InterpolationBGHourly.py",
     "8.RelativeChange.py",
     "9.Boxplot.py",
-    "10.PivotGeneratorMedians.py",
+    "10.PivotGeneratormedians.py",
     "11.MergeRChBasal.py",
 ]
+
+final_scripts = [
+    "G.GraphResults.py",
+    "G.Graph3DCleanBG.py",
+    "G.Graph3DPeaksRemoved.py",
+    "G.Graph3DComplete.py",
+    "S.SimulationAbsortion.py",
+    "G.ComposeFigure3.py",
+]
+
+# -----------------------------------------------------------#
+# Demo data
+# -----------------------------------------------------------#
+# In demo mode the synthetic input files are regenerated from scratch, so a
+# run never mixes files from different generator settings. This only ever
+# touches sample_data/; globals.path1 points at raw/ when DEMO is False and
+# the block below is skipped entirely.
+if globals.DEMO:
+    print("\n========== DEMO MODE: generating synthetic input data ==========\n")
+    print("Results produced from these files are meaningless. Do not compare")
+    print("them with anything reported in the manuscript.\n")
+    shutil.rmtree(globals.path1, ignore_errors=True)
+    subprocess.run(
+        [sys.executable, "S.GenerateSampleData.py",
+         "--out", globals.path1,
+         "--days", str(globals.DEMO_DAYS),
+         "--seed", str(globals.DEMO_SEED),
+         "--ids", *[str(i) for i in globals.ids]],
+        check=True, cwd=HERE,
+    )
+else:
+    # -----------------------------------------------------------#
+    # Real dataset: fail early and say what is missing
+    # -----------------------------------------------------------#
+    # Without this check a missing or misplaced dataset surfaces several
+    # steps later as an unrelated error, which is a poor first experience
+    # for anyone running the code for the first time.
+    missing = [i for i in globals.ids
+               if not os.path.isfile(os.path.join(globals.path1,
+                                                  f"{i}-ws-training.xml"))]
+    if missing:
+        print("\n========== INPUT DATA NOT FOUND ==========\n")
+        print(f"Expected in: {globals.path1}")
+        for i in missing:
+            print(f"  missing: {i}-ws-training.xml")
+        print("\nThe OhioT1DM dataset is not redistributable and is not")
+        print("included here. Request it from its custodians under their Data")
+        print("Use Agreement, then place the training files listed above in")
+        print("the directory shown. Only the '-ws-training' files are used;")
+        print("the test portion is not.")
+        print("\nTo verify that the pipeline executes without the real data,")
+        print("set DEMO = True in globals.py. That runs on synthetic files in")
+        print("the same schema; its outputs are meaningless.\n")
+        sys.exit(1)
+
+# -----------------------------------------------------------#
+# Clean intermediate directory
+# -----------------------------------------------------------#
+# Not optional, and not only for demo runs. Several steps collect their
+# inputs by listing whatever per-day files are present in path2 rather than
+# regenerating a known list, so a file left behind by an earlier or partial
+# run is picked up as if it belonged to this one. The number of days
+# entering the analysis would then depend on the state of the directory
+# instead of on the input data.
+print(f"Clearing intermediate directory: {globals.path2}")
+shutil.rmtree(globals.path2, ignore_errors=True)
+for directory in (globals.path2, globals.path3, globals.path4):
+    os.makedirs(directory, exist_ok=True)
+
+# -----------------------------------------------------------#
+# Per-participant pipeline
+# -----------------------------------------------------------#
+failures = []
 
 for patient_id in globals.ids:
     print(f"\n========== Running pipeline for ID {patient_id} ==========\n")
@@ -39,25 +118,42 @@ for patient_id in globals.ids:
             print(f"{script} completed successfully.\n")
         except subprocess.CalledProcessError as e:
             print(f"An error occurred while running {script} for ID {patient_id}: {e}")
+            failures.append((patient_id, script))
             break
 
-
-final_scripts = [
-    "G.GraphResults.py",
-    "G.Graph3DCleanBG.py",
-    "G.Graph3DPeaksRemoved.py",
-    "G.Graph3DComplete.py",
-    "S.SimulationAbsortion.py",
-    "G.ComposeFigure3.py",
-]
-
-env_final = os.environ.copy()
-env_final["PATIENT_ID"] = str(globals.idG)
+# -----------------------------------------------------------#
+# Aggregation
+# -----------------------------------------------------------#
+# The aggregation scripts read every participant at once, so running them
+# after a partial pipeline would produce figures and tables silently based
+# on an incomplete set. Stop instead.
+if failures:
+    print("\n========== RUN FAILED ==========\n")
+    for patient_id, script in failures:
+        print(f"  ID {patient_id}: {script}")
+    print("\nAggregation scripts were not run, because they read all")
+    print("participants at once and would have produced output from an")
+    print("incomplete set. Fix the errors above and re-run.\n")
+    sys.exit(1)
 
 for script in final_scripts:
     print(f"\n========== Running {script} (all IDs) ==========\n")
+    env_final = os.environ.copy()
+    env_final["PATIENT_ID"] = str(globals.idG)
     try:
         subprocess.run([sys.executable, script], check=True, env=env_final, cwd=HERE)
         print(f"{script} completed successfully.\n")
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running {script}: {e}")
+        failures.append((globals.idG, script))
+
+if failures:
+    print("\n========== RUN FAILED (aggregation) ==========\n")
+    for patient_id, script in failures:
+        print(f"  {script}")
+    sys.exit(1)
+
+print("\n========== RUN COMPLETED ==========\n")
+if globals.DEMO:
+    print("This was a demo run on synthetic data. The outputs are not")
+    print("comparable with the reported results.\n")

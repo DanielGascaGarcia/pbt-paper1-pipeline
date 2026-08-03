@@ -12,7 +12,8 @@ A pipeline to parse and harmonise **CGM / insulin / activity** data, estimate
 in the manuscript.
 
 This release regenerates every figure and table reported in the current version
-of the manuscript.
+of the manuscript. It supersedes the previous release, which produced slightly
+different values — see *Changes in this release*.
 
 ---
 
@@ -46,6 +47,11 @@ The OhioT1DM dataset is **not redistributed here**. It is freely available for
 scientific purposes from
 https://webpages.charlotte.edu/rbunescu/data/ohiot1dm/OhioT1DM-dataset.html
 
+Because the dataset cannot be redistributed, the repository ships
+`S.GenerateSampleData.py`, which produces **fully synthetic** files in the same
+XML schema. This lets anyone verify that the code executes end to end without
+access to the real data. See *Demo mode* below.
+
 ---
 
 ## Key outputs
@@ -67,7 +73,10 @@ re-running the pipeline.
 
 ## Environment
 
-Python 3.9.12 with six pinned dependencies (see `requirements.txt`).
+Python 3.9.12 with six pinned dependencies (see `requirements.txt`). This is the
+environment in which the values reported in the **current version of the
+manuscript** reproduce; it is not a record of the environment used for the
+original submission.
 
 ```bash
 conda create -n pbt python=3.9.12
@@ -94,12 +103,42 @@ python 17.ScriptforTestExperiment1.py
 ```
 
 The orchestrator loops over the participant IDs in `globals.py`, setting
-`PATIENT_ID` for each subprocess, then runs the aggregate scripts once.
+`PATIENT_ID` for each subprocess, then runs the aggregate scripts once. It
+clears `processed/` before starting, and exits with a non-zero status if any
+step fails — without running the aggregate scripts, which read all participants
+at once and would otherwise produce output from an incomplete set.
 
-**The pipeline is not idempotent.** Some steps do not clear the previous run's
-files, and one step renames columns in place, so re-running over a populated
-`processed/` folder produces contaminated output. **Clear `processed/` and start
-from the parser** for any run intended to reproduce the reported values.
+### With the real dataset
+
+Leave `DEMO = False` in `globals.py` and place the `{id}-ws-training.xml` files
+directly in `raw/`. If any expected file is absent the run stops immediately and
+names what is missing, rather than failing several steps later.
+
+### Demo mode
+
+Set `DEMO = True` in `globals.py`. The orchestrator regenerates synthetic files
+into `sample_data/` and runs on those. Demo mode never reads or writes `raw/`,
+so leaving the flag set by accident cannot overwrite data obtained under the
+Data Use Agreement.
+
+The synthetic generator can also be run on its own:
+
+```bash
+python S.GenerateSampleData.py --out ./sample_data --days 5 --ids 559 588
+```
+
+**Demo output is meaningless.** It exists to show that the code runs, not to
+approximate any result. With the default five days per participant the figures
+are sparse and the last day of each participant is incomplete, because the
+midnight-overflow trimming needs the following day to close. That is expected.
+
+### A note on state
+
+Several steps collect their inputs by listing whatever per-day files are present
+in `processed/`, rather than regenerating a known list, and one step renames
+columns in place. A file left behind by an earlier or partial run is therefore
+picked up as if it belonged to the current one. The orchestrator clears
+`processed/` for this reason; **clear it by hand if you run individual steps.**
 
 ### Per-participant sequence
 
@@ -132,10 +171,17 @@ scripts.
 | `id` | current participant, read from the `PATIENT_ID` environment variable |
 | `ids` | the six participants included in this study |
 | `idG` | participant used for the single-subject worked examples (588) |
+| `DEMO` | `False` to use `raw/`; `True` to generate and use synthetic data |
+| `DEMO_DAYS` | days per participant generated in demo mode |
+| `DEMO_SEED` | base seed for the generator, so demo runs are reproducible |
 | `MGDL_TO_MMOL` | unit conversion factor (1/18) |
 | `FIGURE_TITLES` | `False` for submission figures; `True` to render titles for local review |
 | `FIG3_ZLIM_MGDL` | shared z-axis range for the three panels of Figure 3 |
-| `path1`-`path4` | `raw/`, `processed/`, `results/figures/`, `results/tables/` |
+| `path1`-`path4` | input, `processed/`, `results/figures/`, `results/tables/` |
+
+`path1` resolves to `raw/` or to `sample_data/` depending on `DEMO`. All four
+paths are resolved relative to `globals.py`, so the repository runs as cloned
+and an individual script can also be run from any working directory.
 
 ---
 
@@ -147,16 +193,21 @@ pbt-paper1-pipeline/
 ├─ 0.Parser.py … 11.*.py             per-participant pipeline
 ├─ G.*.py                            aggregate scripts
 ├─ S.*.py                            simulation scripts
+├─ S.GenerateSampleData.py           synthetic data generator
 ├─ 17.ScriptforTestExperiment1.py    orchestrator
 ├─ requirements.txt
 ├─ CITATION.cff
 ├─ LICENSE
 ├─ raw/                              input data (not distributed)
-├─ processed/                        intermediates
+├─ sample_data/                      synthetic data (regenerated; not versioned)
+├─ processed/                        intermediates (cleared on each run)
 └─ results/
    ├─ figures/
    └─ tables/
 ```
+
+`sample_data/` and `processed/` are regenerated by the orchestrator and are
+listed in `.gitignore`.
 
 ---
 
@@ -179,8 +230,22 @@ pbt-paper1-pipeline/
 
 ## Changes in this release
 
-**These changes affect how results are presented, not what is computed.** The
-analysis, thresholds, exclusion windows and statistical treatment are unchanged.
+### Corrections that change reported values
+
+- **Off-by-one in the box plot step.** `9.Boxplot.py` derived its row count from
+  the column count of a file with a different number of non-data columns,
+  discarding the last day of every participant — about 2% of the data — silently,
+  because pandas aligns by index. Corrected. The values reported in the
+  manuscript were updated accordingly; the changes are on the order of one
+  percentage point and no conclusion is affected.
+
+Every figure and table in the current version of the manuscript was regenerated
+from this release.
+
+### Changes to presentation only
+
+The analysis, thresholds, exclusion windows and statistical treatment are
+unchanged by everything in this subsection.
 
 - **Configuration centralised.** Participant IDs, the unit conversion factor,
   the figure-title switch and the shared axis range moved into `globals.py`.
@@ -200,6 +265,17 @@ analysis, thresholds, exclusion windows and statistical treatment are unchanged.
   z-axis range, composed into a single image by `G.ComposeFigure3.py`.
 - **Data behind figures exported** to `results/tables/`.
 
+### Changes to how the pipeline is run
+
+- **Synthetic data generator added**, so the pipeline can be executed without
+  the OhioT1DM dataset.
+- **The orchestrator clears `processed/`** before every run, instead of relying
+  on the reader to do it.
+- **Missing input files are reported up front** rather than surfacing as an
+  unrelated error several steps later.
+- **A failed step now stops the run** with a non-zero exit status, and the
+  aggregate scripts are not executed on an incomplete set.
+
 ---
 
 ## Documented limitations
@@ -207,20 +283,26 @@ analysis, thresholds, exclusion windows and statistical treatment are unchanged.
 - **Column naming depends on element order in the source XML.** `1.ColumnNamer.py`
   assigns column names by position (index 0 = glucose level, 1 = finger stick,
   2 = basal, and so on). This matches the OhioT1DM file structure but would
-  mislabel columns if applied to XML with the variables in a different order.
+  mislabel columns if applied to XML with the variables in a different order —
+  silently, with no error until several steps later. The synthetic generator
+  emits the elements in the required order for the same reason.
 - **Parsing failures are silent.** The parsing and column-naming steps wrap each
   variable in a bare `except` and print a message rather than stopping. A
   variable that fails to parse produces no `_wCN` file and the pipeline
   continues. Check the console output of steps 0 and 1 before trusting a run.
+- **Day columns are ordered by the filesystem.** `5.MergeBGClean.py` collects
+  per-day files with `os.listdir` without sorting, so the day columns of
+  `BGwNMLeftJoined{id}.csv` (`BGValue0`, `BGValue1`, …) are indexed in
+  filesystem order rather than by date. No reported statistic depends on that
+  order: all summaries are computed per hour of day or per participant. Note
+  that a naive `sorted()` would not fix this, because the filenames carry the
+  weekday before the date.
 - **Panel letters and annotation boxes are added manually.** The code produces
   the plots; the A/B/C markers and boxes used in the manuscript are applied
   afterwards in an image editor. The underlying values are unaffected.
 - **Exact rendering is not guaranteed across systems.** Font availability and
   backend differences change pixel output. The values are reproducible; the
   rendering is not bit-identical.
-- **One aggregation step reads files with `os.listdir` without sorting**, so the
-  column order of one intermediate table depends on the filesystem. Nothing
-  downstream depends on that order.
 
 ---
 

@@ -15,9 +15,7 @@ from scipy.signal import butter, lfilter, freqz
 import operator
 import globals
 
-# -----------------------------------------------------------#
-#              Configurable variables
-# -----------------------------------------------------------#
+# --- Configurable global variable ---
 id = globals.id;
 filesBG=[];
 filesBolus=[];
