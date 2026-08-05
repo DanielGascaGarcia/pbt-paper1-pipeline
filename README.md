@@ -317,8 +317,9 @@ unchanged by everything in this subsection.
   order: all summaries are computed per hour of day or per participant. Note
   that a naive `sorted()` would not fix this, because the filenames carry the
   weekday before the date.
-- **Panel letters and annotation boxes are added manually.** The code produces
-  the plots; the A/B/C markers and boxes used in the manuscript are applied
+- **Panel letters and annotation boxes are added manually.** `G.ComposeFigure3.py`
+  assembles and labels the panels of Figure 3. Elsewhere in the manuscript the
+  A/B/C markers and the boxes around the intervals they identify are applied
   afterwards in an image editor. The underlying values are unaffected.
 - **Exact rendering is not guaranteed across systems.** Font availability and
   backend differences change pixel output. The values are reproducible; the
