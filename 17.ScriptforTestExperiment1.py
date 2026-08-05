@@ -34,6 +34,7 @@ scripts = [
 ]
 
 final_scripts = [
+     "G.CGMCoverage.py",
     "G.GraphResults.py",
     "G.Graph3DCleanBG.py",
     "G.Graph3DPeaksRemoved.py",

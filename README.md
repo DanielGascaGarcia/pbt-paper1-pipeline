@@ -27,9 +27,11 @@ different values — see *Changes in this release*.
 - **Active insulin** simulation from basal (Rayleigh-like kernel)
 - Final merge for multi-panel figures (ΔBG, basal / active insulin, activity)
 
-The analysis covers the six OhioT1DM participants who reported physical
-activity — 559, 563, 570, 575, 588 and 591 — over a 45-day retrospective
-window, using the training split of the dataset.
+The analysis covers the six OhioT1DM participants whose sensor band reports
+step counts — 559, 563, 570, 575, 588 and 591 — using the training split of the
+dataset. The training split provides between 41 and 46 days per participant
+(mean 44, approximately six weeks); the manuscript refers to this as the
+45-day retrospective window.
 
 ---
 
@@ -42,6 +44,22 @@ window, using the training split of the dataset.
 - Configuration in `globals.py`
 
 > **Time key:** `Key` (datetime; 1–5 min resolution depending on step).
+
+CGM coverage is not uniform across days: some days carry fewer than the 288
+readings a complete day would hold. No day is excluded on that basis. Hours
+with no reading contribute nothing to the median for that hour, and the
+three-level reliability measure flags hours supported by few days.
+
+Coverage is computed per day by `G.CGMCoverage.py` as the count of non-null
+`BGValue2` entries in each per-day `_wCN ` file, expressed against 288 — the
+number of readings a complete day would hold at the 5-minute CGM sampling
+interval. `BGValue2` is the column as parsed, before meal-related exclusion, so
+the figure measures the sensor record rather than the effect of the algorithm.
+Two tables are written to `results/tables/`: `CGMCoverage_byID.csv`, with the
+number of days and the mean, median, minimum and maximum daily coverage per
+participant together with the number and proportion of days at or above 70%,
+and `CGMCoverage_byDay.csv`, with the same figure for every individual day.
+Both are descriptive: no reported value depends on them.
 
 The OhioT1DM dataset is **not redistributed here**. It is freely available for
 scientific purposes from
@@ -152,8 +170,9 @@ picked up as if it belonged to the current one. The orchestrator clears
 
 ### Aggregate scripts (run once, after the per-participant loop)
 
-`G.GraphResults.py` → `G.Graph3DCleanBG.py` → `G.Graph3DPeaksRemoved.py` →
-`G.Graph3DComplete.py` → `S.SimulationAbsortion.py` → `G.ComposeFigure3.py`
+`G.CGMCoverage.py` → `G.GraphResults.py` → `G.Graph3DCleanBG.py` →
+`G.Graph3DPeaksRemoved.py` → `G.Graph3DComplete.py` → `S.SimulationAbsortion.py`
+→ `G.ComposeFigure3.py`
 
 These are called by the orchestrator with `PATIENT_ID` set to `idG`.
 `G.ComposeFigure3.py` runs last because it reads the three panel PNGs written
@@ -225,6 +244,7 @@ listed in `.gitignore`.
 | Figures 6–11 | `11.MergeRChBasal.py`, one per participant |
 | Figures 12–15 | `G.GraphResults.py` |
 | Summary tables | `G.GraphResults.py` -> `results/tables/` |
+| CGM coverage tables | `G.CGMCoverage.py` -> `results/tables/` |
 
 ---
 
