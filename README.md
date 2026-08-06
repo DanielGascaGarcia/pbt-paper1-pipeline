@@ -112,6 +112,10 @@ This check matters: several environments on the original development machine
 shared the same display name, and running under the wrong one produced
 different output.
 
+Reproducibility was verified by executing the full pipeline from a clean state
+and comparing the resulting artefacts across independent runs, which were
+identical.
+
 ---
 
 ## Running the pipeline
@@ -333,7 +337,26 @@ unchanged by everything in this subsection.
 *Personalised Basal Tuner (PBT): Retrospective Identification of Basal Insulin
 Miscalibration in People with Type 1 Diabetes Mellitus.* Under review.
 
-**Software:** see `CITATION.cff`. DOI: **[add on release]**
+**Software:** Gasca García, D. *Personalised Basal Tuner (PBT) — Paper 1
+Pipeline* [software]. Zenodo. doi: **10.5281/zenodo.17392920**
+
+The DOI above is the concept DOI: it always resolves to the most recent
+version. See `CITATION.cff`.
+
+```bibtex
+@software{gasca_garcia_pbt_paper1,
+  author  = {Gasca García, Daniel},
+  title   = {Personalised Basal Tuner (PBT) — Paper 1 Pipeline},
+  year    = {2026},
+  doi     = {10.5281/zenodo.17392920},
+  url     = {https://doi.org/10.5281/zenodo.17392920}
+}
+```
+
+Related deposits, by concept DOI:
+
+- Paper 2 pipeline — 10.5281/zenodo.17393514
+- Software compendium — 10.5281/zenodo.17675142
 
 ---
 
