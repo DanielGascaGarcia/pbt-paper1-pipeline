@@ -145,13 +145,9 @@ different output.
 
 Reproducibility was verified by executing the full pipeline twice from a clean
 state and comparing the resulting artefacts between runs. Seven artefacts were
-compared and were identical byte for byte. Both sets of outputs are included
-under `verification/run1/` and `verification/run2/`, so the comparison can be
-repeated without re-running the pipeline:
-
-```bash
-diff -r verification/run1 verification/run2
-```
+compared and were identical byte for byte. To repeat the check, run the
+pipeline twice, copying the contents of `results/tables/` to a separate
+directory after the first run, and compare the two.
 
 ---
 
