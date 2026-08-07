@@ -96,15 +96,46 @@ environment in which the values reported in the **current version of the
 manuscript** reproduce; it is not a record of the environment used for the
 original submission.
 
+Either route below works. They differ in one respect: conda installs Python
+3.9.12 for you, whereas `venv` requires it to be present already.
+
+**Option A — conda**
+
 ```bash
 conda create -n pbt python=3.9.12
 conda activate pbt
 pip install -r requirements.txt
 ```
 
+**Option B — venv, no conda required**
+
+Check first that Python 3.9 is available (`python3.9 --version`, or
+`py -3.9 --version` on Windows). If it is not, install it from python.org or
+your system package manager, or use Option A.
+
+```bash
+# Linux / macOS
+python3.9 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+```powershell
+# Windows (PowerShell)
+py -3.9 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Other Python versions have not been tested and are not guaranteed to reproduce
+the reported values.
+
 Before running, confirm the interpreter actually in use:
 
 ```bash
+python --version                              # expect 3.9.12
 python -c "import sys; print(sys.executable)"
 ```
 
@@ -112,9 +143,15 @@ This check matters: several environments on the original development machine
 shared the same display name, and running under the wrong one produced
 different output.
 
-Reproducibility was verified by executing the full pipeline from a clean state
-and comparing the resulting artefacts across independent runs, which were
-identical.
+Reproducibility was verified by executing the full pipeline twice from a clean
+state and comparing the resulting artefacts between runs. Seven artefacts were
+compared and were identical byte for byte. Both sets of outputs are included
+under `verification/run1/` and `verification/run2/`, so the comparison can be
+repeated without re-running the pipeline:
+
+```bash
+diff -r verification/run1 verification/run2
+```
 
 ---
 
