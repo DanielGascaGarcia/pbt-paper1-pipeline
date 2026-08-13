@@ -48,12 +48,15 @@ DEMO = True
 # belonged to the current one. The orchestrator clears path2 before every
 # run for this reason; clear it by hand if you run steps individually.
 HERE = os.path.dirname(os.path.abspath(__file__))
+_out = 'demo_output' if DEMO else '.'
 
 path1 = os.path.join(HERE, 'sample_data' if DEMO else 'raw') + '/'
-path2 = os.path.join(HERE, 'processed') + '/'
-path3 = os.path.join(HERE, 'results', 'figures') + '/'
-path4 = os.path.join(HERE, 'results', 'tables') + '/'
+path2 = os.path.join(HERE, _out, 'processed') + '/'
+path3 = os.path.join(HERE, _out, 'results', 'figures') + '/'
+path4 = os.path.join(HERE, _out, 'results', 'tables') + '/'
 
+for _p in (path2, path3, path4):
+    os.makedirs(_p, exist_ok=True)
 # -----------------------------------------------------------#
 # Participant selection
 # -----------------------------------------------------------#
@@ -68,7 +71,7 @@ id = int(os.environ.get("PATIENT_ID", 559))
 
 # Participants included in this experiment: the six OhioT1DM subjects that
 # report self-reported activity. Used by the aggregation scripts that plot
-# all participants at once (G.GraphResults.py, G.GraphBoxPlots.py), and by
+# all participants at once (G.GraphResults.py), and by
 # the orchestrator to decide which synthetic files to generate in demo mode.
 ids = [559, 563, 570, 575, 588, 591]
 

@@ -34,7 +34,7 @@ scripts = [
 ]
 
 final_scripts = [
-     "G.CGMCoverage.py",
+    "G.CGMCoverage.py",
     "G.GraphResults.py",
     "G.Graph3DCleanBG.py",
     "G.Graph3DPeaksRemoved.py",
@@ -50,6 +50,8 @@ final_scripts = [
 # run never mixes files from different generator settings. This only ever
 # touches sample_data/; globals.path1 points at raw/ when DEMO is False and
 # the block below is skipped entirely.
+print(f"Interpreter: {sys.executable}\n")
+
 if globals.DEMO:
     print("\n========== DEMO MODE: generating synthetic input data ==========\n")
     print("Results produced from these files are meaningless. Do not compare")
@@ -106,6 +108,7 @@ for directory in (globals.path2, globals.path3, globals.path4):
 # Per-participant pipeline
 # -----------------------------------------------------------#
 failures = []
+completed = []
 
 for patient_id in globals.ids:
     print(f"\n========== Running pipeline for ID {patient_id} ==========\n")
@@ -121,6 +124,8 @@ for patient_id in globals.ids:
             print(f"An error occurred while running {script} for ID {patient_id}: {e}")
             failures.append((patient_id, script))
             break
+    else:
+        completed.append(patient_id)
 
 # -----------------------------------------------------------#
 # Aggregation
@@ -136,6 +141,37 @@ if failures:
     print("participants at once and would have produced output from an")
     print("incomplete set. Fix the errors above and re-run.\n")
     sys.exit(1)
+
+# -----------------------------------------------------------#
+# Confirm every participant produced its summary file
+# -----------------------------------------------------------#
+# A step can lose a participant without raising: an empty read, a silent
+# exception, a filter that matches nothing. The pipeline then completes and
+# the aggregation scripts average over whatever is present. Check explicitly
+# rather than rely on a figure looking wrong.
+#
+# Size is checked as well as existence: a step that opens its output file
+# and then fails leaves a zero-byte CSV behind, which os.path.isfile alone
+# would accept as a successful run.
+expected = {i: f"Boxplot{i}0-24total.csv" for i in globals.ids}
+absent = {}
+for i, f in expected.items():
+    p = os.path.join(globals.path2, f)
+    if not os.path.isfile(p):
+        absent[i] = f"{f} (not found)"
+    elif os.path.getsize(p) == 0:
+        absent[i] = f"{f} (empty)"
+if absent:
+    print("\n========== OUTPUTS MISSING AFTER PIPELINE ==========\n")
+    print(f"Expected in: {globals.path2}")
+    for i, f in absent.items():
+        print(f"  ID {i}: {f}")
+    print(f"\n{len(absent)} of {len(globals.ids)} participants produced no")
+    print("usable summary file, and every step reported success. Aggregation")
+    print("was not run: it reads all participants at once and would have")
+    print("produced output from an incomplete set.\n")
+    sys.exit(1)
+print(f"\nAll {len(globals.ids)} participants produced a summary file.")
 
 for script in final_scripts:
     print(f"\n========== Running {script} (all IDs) ==========\n")
@@ -155,6 +191,8 @@ if failures:
     sys.exit(1)
 
 print("\n========== RUN COMPLETED ==========\n")
+print(f"  IDs attempted : {len(globals.ids)}")
+print(f"  IDs completed : {len(completed)}")
 if globals.DEMO:
-    print("This was a demo run on synthetic data. The outputs are not")
+    print("\nThis was a demo run on synthetic data. The outputs are not")
     print("comparable with the reported results.\n")

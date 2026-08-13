@@ -14,6 +14,10 @@ processed/
 # files.
 sample_data/
 
+# Synthetic outputs. Written to demo_output/ when DEMO is True, so a demo
+# run cannot overwrite the tracked tables under results/tables/.
+demo_output/
+
 # Figures are reproduced by running the pipeline; the tables under
 # results/tables/ ARE tracked, so the reported values can be checked
 # without access to the OhioT1DM dataset.

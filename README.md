@@ -143,11 +143,11 @@ This check matters: several environments on the original development machine
 shared the same display name, and running under the wrong one produced
 different output.
 
-Reproducibility was verified by executing the full pipeline twice from a clean
-state and comparing the resulting artefacts between runs. Seven artefacts were
-compared and were identical byte for byte. To repeat the check, run the
-pipeline twice, copying the contents of `results/tables/` to a separate
-directory after the first run, and compare the two.
+Reproducibility was verified by executing the full pipeline three times from a
+clean state and comparing the resulting artefacts between runs. Seven artefacts
+were compared on each occasion and were identical byte for byte. To repeat the
+check, run the pipeline twice, copying the contents of `results/tables/` to a
+separate directory after the first run, and compare the two.
 
 ---
 
@@ -176,6 +176,11 @@ into `sample_data/` and runs on those. Demo mode never reads or writes `raw/`,
 so leaving the flag set by accident cannot overwrite data obtained under the
 Data Use Agreement.
 
+Demo mode also redirects every output: intermediates, figures and tables are
+written under `demo_output/` instead of `processed/` and `results/`. The tables
+under `results/tables/` are tracked in the repository, and this keeps a demo run
+from overwriting them with synthetic values.
+
 The synthetic generator can also be run on its own:
 
 ```bash
@@ -194,6 +199,12 @@ in `processed/`, rather than regenerating a known list, and one step renames
 columns in place. A file left behind by an earlier or partial run is therefore
 picked up as if it belonged to the current one. The orchestrator clears
 `processed/` for this reason; **clear it by hand if you run individual steps.**
+
+Each step runs as a separate process and imports `globals.py` as it stands on
+disk at that moment, while the orchestrator reads it once at startup.
+**Do not edit `globals.py` while a run is in progress:** steps that start after
+the edit use the new values and the ones already finished do not, which splits
+the run across two configurations.
 
 ### Per-participant sequence
 
@@ -235,9 +246,11 @@ scripts.
 | `FIG3_ZLIM_MGDL` | shared z-axis range for the three panels of Figure 3 |
 | `path1`-`path4` | input, `processed/`, `results/figures/`, `results/tables/` |
 
-`path1` resolves to `raw/` or to `sample_data/` depending on `DEMO`. All four
-paths are resolved relative to `globals.py`, so the repository runs as cloned
-and an individual script can also be run from any working directory.
+`path1` resolves to `raw/` or to `sample_data/` depending on `DEMO`; `path2` to
+`path4` resolve under `demo_output/` when `DEMO` is True and at the top level
+otherwise. All four paths are resolved relative to `globals.py`, so the
+repository runs as cloned and an individual script can also be run from any
+working directory.
 
 ---
 
@@ -257,13 +270,14 @@ pbt-paper1-pipeline/
 ├─ raw/                              input data (not distributed)
 ├─ sample_data/                      synthetic data (regenerated; not versioned)
 ├─ processed/                        intermediates (cleared on each run)
+├─ demo_output/                      all demo-mode output (not versioned)
 └─ results/
    ├─ figures/
    └─ tables/
 ```
 
-`sample_data/`, `processed/` and `results/figures/` are created by the code and
-are listed in `.gitignore`. `raw/` is the only directory you need to create
+`sample_data/`, `processed/`, `demo_output/` and `results/figures/` are created
+by the code and are listed in `.gitignore`. `raw/` is the only directory you need to create
 yourself, and only when running against the real dataset.
 
 ---
@@ -329,6 +343,12 @@ unchanged by everything in this subsection.
   the OhioT1DM dataset.
 - **The orchestrator clears `processed/`** before every run, instead of relying
   on the reader to do it.
+- **Demo mode redirects its output** to `demo_output/`. Previously only the
+  input path was redirected, so a demo run overwrote the tracked tables under
+  `results/tables/` with synthetic values.
+- **The per-participant summary files are checked** after the loop: a run stops
+  if any of them is absent or empty, rather than leaving the aggregate scripts
+  to average over whatever is present.
 - **Missing input files are reported up front** rather than surfacing as an
   unrelated error several steps later.
 - **A failed step now stops the run** with a non-zero exit status, and the
@@ -390,7 +410,7 @@ version. See `CITATION.cff`.
 Related deposits, by concept DOI:
 
 - Paper 2 pipeline — 10.5281/zenodo.17393514
-- Software compendium — 10.5281/zenodo.17675142
+- Software compendium — 10.5281/zenodo.17675141
 
 ---
 
