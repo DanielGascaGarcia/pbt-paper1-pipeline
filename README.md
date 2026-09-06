@@ -93,11 +93,12 @@ re-running the pipeline.
 
 Python 3.9.12 with six pinned dependencies (see `requirements.txt`). This is the
 environment in which the values reported in the **current version of the
-manuscript** reproduce; it is not a record of the environment used for the
-original submission.
+manuscript** reproduce.
 
-Either route below works. They differ in one respect: conda installs Python
-3.9.12 for you, whereas `venv` requires it to be present already.
+Reproducibility was verified using Option A (conda). Option B (venv) should
+produce an equivalent environment but has not been independently verified.
+They differ in one respect: conda installs Python 3.9.12 for you, whereas
+`venv` requires it to be present already.
 
 **Option A — conda**
 
