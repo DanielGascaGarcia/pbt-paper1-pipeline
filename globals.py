@@ -36,7 +36,7 @@ matplotlib.use("Agg")
 #
 # Results produced in demo mode are meaningless. Do not compare them with
 # anything reported in the manuscript.
-DEMO = False
+DEMO = True
 
 # -----------------------------------------------------------#
 # Paths
