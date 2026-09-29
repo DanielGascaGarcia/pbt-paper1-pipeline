@@ -90,7 +90,7 @@ access to the real data. See *Demo mode* below.
 | `Figure12_data.csv`, `Figure12_key_values.csv` | hours by insulin condition per participant, and the values quoted in the text (off-target %, optimal hours per participant) | reported |
 | `SumUMedRelChange_byID.csv`, `SummaryStats_UMedRelChange.csv` | per participant, the daily cumulative absolute relative change, and its mean and SD | reported |
 | `MedRelChange_extremes.csv` | range of the hourly medians across participants | reported |
-| `CGMCoverage_byID.csv`, `CGMCoverage_byDay.csv` | sensor coverage per participant and per day | reported (days per participant) and diagnostic |
+| `CGMCoverage_byID.csv`, `CGMCoverage_byDay.csv`, `CGMCoverage_summary.csv` | sensor coverage per participant and per day | reported (days per participant) and diagnostic |
 
 Every figure that carries a number in the manuscript has a corresponding CSV
 here, so the reported values can be checked without re-running the pipeline.
