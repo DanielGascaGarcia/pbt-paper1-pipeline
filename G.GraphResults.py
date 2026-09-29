@@ -1,7 +1,61 @@
-#Code: G.GraphResults.py
-#Description: Graph values of Blood Glucose.
-#Created 3rd August 2023
-#Author: mbaxdg6
+"""
+G.GraphResults.py
+Aggregation over the six participants of paper 1: hourly categories, summary
+statistics and Figures 12, 13, 14 and 15.
+
+Created: 3 August 2023
+Author:  mbaxdg6 (Daniel Gasca Garcia)
+
+What it does
+    1. For each participant, takes one row per hour from ComparisonJoined<id>.csv
+       (minute 1 of every hour; all columns used here are constant within the
+       hour) and classifies the hourly median BG relative change:
+           > 0   "1. Too little insulin"
+           < 0   "2. Too much insulin"
+           = 0   "3. Optimal"
+           empty "4. Missing"
+       It also keeps the absolute value, UMedRelChange.
+    2. Sum of UMedRelChange over the 24 hours of each participant
+       (SumUMedRelChange_byID), and the mean and SD of those six sums
+       (SummaryStats_UMedRelChange). These are the "daily cumulative" values of
+       the manuscript (117.42 mg/dL, SD 25.08; highest individual 159.0).
+       NOTE: they are sums of ABSOLUTE HOURLY RELATIVE CHANGES, not glucose
+       levels. Hours with no data add nothing to the sum.
+    3. Largest and smallest hourly median relative change among the
+       off-target hours (MedRelChange_extremes: -20.5 to 21.0 mg/dL).
+    4. Figures:
+         Figure 12  bar chart: hours per category and participant, plus the
+                    caption values (Figure12_key_values, Figure12_data)
+         Figure 13  box plots of the off-target hourly median relative changes,
+                    by participant and category, secondary axis in mmol/L
+         Figure 14  heat map: absolute hourly median relative change,
+                    hour x participant
+         Figure 15  heat map: median hourly steps (Q50ExerciseValue),
+                    hour x participant. It shows the step VALUES, not the
+                    low / medium / high activity categories.
+
+Inputs
+    globals.ids, globals.path2, globals.path3, globals.path4,
+    globals.MGDL_TO_MMOL, globals.FIGURE_TITLES
+    <path2>/ComparisonJoined<id>.csv   for every id   (11.MergeRChBasal.py)
+
+Outputs
+    <path2>/ComparisonSampled<id>.csv, ComparisonSampled<id>Clean.csv,
+            Complete.csv, CompleteBP.csv, MedianUMedRelChange.csv,
+            SumUMedRelChange.csv
+    <path4>/SumUMedRelChange_byID.csv, SummaryStats_UMedRelChange.csv,
+            MedRelChange_extremes.csv, Figure12_key_values.csv, Figure12_data.csv
+    <path3>/Figure12.png, Figure13.png, Figure14.png, Figure15.png
+
+Notes
+    - MedRelChange is multiplied by 18 when sampled and divided by 18 again
+      when stored, so the values stay in mg/dL. The two operations cancel.
+    - The two sort_values(by=['ID']) calls do not assign their result, so they
+      have no effect (the rows are already in ID order).
+    - Figure 13: the x axis is the participant ID and the colour is the
+      category. (Earlier versions labelled the x axis "Category".)
+    - The first box plot (sums per participant) is drawn but not saved.
+"""
 
 import pandas as pd
 from pandas import DataFrame
@@ -41,6 +95,7 @@ Complete=pd.DataFrame();
 CompleteBP=pd.DataFrame();  
 
 
+# ---- Per participant: one row per hour ----
 for id in globals.ids:
    fileToRead="ComparisonJoined"+str(id);
    fileToSave="ComparisonSampled"+str(id);
@@ -81,12 +136,14 @@ for id in globals.ids:
       # print(i);
       (h, m, s) = Key[i].split(':');
       result = (int(h) * 3600 + int(m) * 60 + int(s))/3600;
+      # Minute 1 of each hour (i % 60 == 1, since True == 1).
       if i % int(60) ==True:
          if numpy.isnan(MedRelChange[i])==True:
             T_Reliability.append(np.nan);
          else:
             T_Reliability.append(Reliability[i]);
          T_Elevel.append(Elevel[i]);
+         # x18 here and /18 below cancel out: values stay in mg/dL.
          T_MedRelChange.append(18*MedRelChange[i]);
          T_ActiveInsulin.append(ActiveInsulin[i]);
          T_BasalInfused.append(BasalInfused[i]);
@@ -94,6 +151,7 @@ for id in globals.ids:
          T_Q50ExerciseValue.append(Q50ExerciseValue[i]);
          
          ID.append(id);
+         # Category of the hour from the sign of the median relative change.
          if MedRelChange[i]>0:
             Flag_pos.append("1. Too little insulin");
          elif MedRelChange[i]<0:
@@ -103,6 +161,7 @@ for id in globals.ids:
          else:
             Flag_pos.append("4. Missing")  
 
+         # Reliability label of the hour (3 high, 2 medium, 1 low).
          if  Reliability[i]==3:
              Flag_R.append("high");
          elif  Reliability[i]==2:
@@ -124,6 +183,7 @@ for id in globals.ids:
    #                           Sample
    # -----------------------------------------------------------#
    Sample=pd.DataFrame();   
+   # 24 hourly time labels, 00:00:00 ... 23:00:00.
    medTime=[];
    j=0;
    while dt < end: 
@@ -157,6 +217,7 @@ for id in globals.ids:
 # -----------------------------------------------------------#
 # All results
 # -----------------------------------------------------------# 
+# (sort_values without assignment: no effect.)
 CompleteBP.sort_values(by=['ID'])
 CompleteBP.to_csv(str(path2)+"CompleteBP"+".csv",index=False);
 Complete.sort_values(by=['ID'])
@@ -172,6 +233,8 @@ df_median = pd.DataFrame({
 });
 df_median.to_csv(f"{path2}MedianUMedRelChange.csv", index=False);
 
+# Daily cumulative value per participant: sum over the 24 hours of the
+# ABSOLUTE hourly median relative change (not a glucose level).
 df_sum = Complete.groupby('ID', as_index=False)['UMedRelChange'].sum();
 df_sum = df_sum.rename(columns={'UMedRelChange': 'UMedRelChange_mgdL'});
 df_sum['UMedRelChange_mmolL'] = df_sum['UMedRelChange_mgdL'] * MGDL_TO_MMOL;
@@ -180,6 +243,7 @@ print(df_sum);
 
 sns.boxplot(y='UMedRelChange_mgdL', data=df_sum, width=0.1, color="Red");
 
+# Mean and SD (ddof=1) of the six per-participant sums.
 mean_value = df_sum['UMedRelChange_mgdL'].mean();
 sd_value   = df_sum['UMedRelChange_mgdL'].std();
 print(f"Mean = {mean_value:.2f} mg/dL ({mean_value*MGDL_TO_MMOL:.3f} mmol/L), "
@@ -212,6 +276,7 @@ plt.show();
 # -----------------------------------------------------------#
 # Locate the extreme outliers of the boxplot
 # -----------------------------------------------------------#
+# Extremes among the off-target hours only (CompleteBP).
 max_val = CompleteBP['MedRelChange'].max();
 min_val = CompleteBP['MedRelChange'].min();
 print("Max:", max_val, " Min:", min_val);
@@ -225,6 +290,7 @@ print("SAVED:", os.path.abspath(path4 + "MedRelChange_extremes.csv"));
 # -----------------------------------------------------------#
 # Box plot of relative changes by kind or insulin problem  -> Figure 13
 # -----------------------------------------------------------#
+# Figure 13: x = participant ID, colour = category.
 plt.figure(figsize=(12, 8));
 sns.boxplot(y ='MedRelChange',
               x ='ID',data=CompleteBP,  hue = CompleteBP['Category'], width=0.4);
@@ -234,7 +300,7 @@ sns.boxplot(y ='MedRelChange',
 # -----------------------------------------------------------#
 ax13 = plt.gca();
 ax13.set_ylabel("Blood glucose relative change (mg/dL)");
-plt.xlabel("Category");
+plt.xlabel("ID");
 plt.grid(which='major', color='#DDDDDD', linewidth=0.8);
 plt.grid(which='minor', color='#DDDDDD', linestyle=':', linewidth=0.5);
 plt.axhline(linewidth=2, color='Black');
@@ -252,11 +318,13 @@ plt.show();
 # -----------------------------------------------------------#
 # Histogram of relative changes by kind or insulin problem  -> Figure 12
 # -----------------------------------------------------------#
+# Figure 12: number of hours per participant and category.
 df_gb = Complete.groupby(["ID","Category"]).size().unstack(level=1)
 
 # -----------------------------------------------------------#
 # Values quoted in the Figure 12 caption
 # -----------------------------------------------------------#
+# Values quoted in the Figure 12 caption. n_total = 24 x participants.
 counts = Complete['Category'].value_counts();
 n_participants = Complete['ID'].nunique();
 n_total = len(Complete);                    # 24 h x participants
@@ -301,6 +369,7 @@ print("Saved:", os.path.abspath(path4 + "Figure12_data.csv"));
 # -----------------------------------------------------------#
 # Display the heatmap of relative change  -> Figure 14
 # -----------------------------------------------------------#
+# Figure 14: absolute hourly median relative change, hour x participant.
 plt.figure(figsize=(12, 8));
 pvR = Complete.pivot_table(values='UMedRelChange',index='Time',columns='ID')
 ax14 = sns.heatmap(pvR,cmap="plasma",linecolor='Gray',linewidths=0.5);
@@ -321,6 +390,7 @@ plt.savefig(path3 + 'Figure14.png', dpi=300, bbox_inches='tight');
 # -----------------------------------------------------------#
 # Display the heatmap of activity  -> Figure 15
 # -----------------------------------------------------------#
+# Figure 15: median hourly STEPS (values, not activity categories).
 plt.figure(figsize=(12, 8));
 pvR = Complete.pivot_table(values='Q50ExerciseValue',index='Time',columns='ID')
 sns.heatmap(pvR,cmap="inferno",linecolor='Gray',linewidths=0.5);

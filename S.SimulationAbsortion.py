@@ -1,7 +1,24 @@
-#Code: 6.Simulation.py
-#Description: Simulation of Blood Glucose given the Bolus insulin infused.
-#Created 15th November 2022
-#Author: mbaxdg6
+"""
+S.SimulationAbsortion.py   (header of the original file reads "6.Simulation.py")
+Figure 5 of paper 1: Rayleigh densities with peaks at 1, 2, 4 and 8 hours.
+
+Created: 15 November 2022
+Author:  mbaxdg6 (Daniel Gasca Garcia)
+
+What it does
+    Plots the probability density of four Rayleigh distributions (scale 1, 2,
+    4 and 8 h) over 0-12 h. The peak of a Rayleigh density is at its scale,
+    so the curves peak at 1, 2, 4 and 8 h. The curve with scale 1 h is the
+    one used for rapid-acting insulin in 6.SimulationBasalAutomated.py.
+    (The original header described a blood glucose simulation from boluses;
+    that is not what this script does.)
+
+Inputs
+    globals.path3, globals.FIGURE_TITLES   (no data files)
+
+Output
+    <path3>/Figure5.png
+"""
 
 # globals is imported first: it selects the non-interactive backend, which
 # has to happen before pyplot/pylab is loaded.
@@ -20,6 +37,8 @@ path3 = globals.path3;
 os.makedirs(path3, exist_ok=True);
 
 
+# 144 time points over 0-12 h (about one every 5 minutes).
+# rayleigh(loc, scale): loc = 0, scale = time of the peak in hours.
 #Rapid
 x=np.linspace(0,12,144);
 a, b = 0, 1;

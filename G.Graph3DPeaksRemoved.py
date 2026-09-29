@@ -1,7 +1,32 @@
-#Code: 4.MergeBasal.py
-#Description: Merge of values.
-#Created 3rd November 2022
-#Author: mbaxdg6
+"""
+G.Graph3DPeaksRemoved.py   (header of the original file reads "4.MergeBasal.py")
+Figure 3b of paper 1: the CGM readings REMOVED by the meal-related exclusion
+for the worked-example participant, as a 3D scatter.
+
+Author: mbaxdg6 (Daniel Gasca Garcia)
+
+What it does
+    Uses column ValueCh of the daily working copies from step 4: it holds the
+    original value of every removed reading and 0 for the readings that were
+    kept. The zeros are blanked, so only the removed readings are plotted.
+    Despite "Peaks" in the name, these are the post-meal windows, not the
+    peak-based branch of paper 2.
+
+Inputs
+    globals.idG (588), globals.path2, globals.path3, globals.MGDL_TO_MMOL,
+    globals.FIGURE_TITLES
+    <path2>/PivotBG_wCN.csv
+    <path2>/glucose_level<id>-ws-training_wCN <Weekday>-<YYYY-MM-DD> .csv
+
+Outputs
+    <path2>/BGwOnlyMLeftJoined<id>.csv   minute grid, one column per day
+    <path3>/Figure3b.png
+
+Notes
+    - "Day number" follows the os.listdir order of the day files (see
+      G.Graph3DComplete.py).
+    - The z range is fixed at 0-400 mg/dL (same as globals.FIG3_ZLIM_MGDL).
+"""
 
 
 import pandas as pd
@@ -13,6 +38,7 @@ import numpy as np
 matplotlib.rcParams.update({'font.size': 18});
 import globals
 # Parameters
+# Worked-example participant (588), whatever PATIENT_ID says.
 id=globals.idG;
 path2=globals.path2;
 path3=globals.path3;
@@ -47,6 +73,7 @@ listVariables=['glucose_level',
 
 
 filesToGraph=[];
+# Daily working copies from step 4 (note the "_wCN " with the space).
 for file in os.listdir(path2):
     # print(listVariables[0]+str(fileToRead)+str('_wCNF ')); 
     if file.startswith(listVariables[0]+str(fileToRead)+"_wCN "):
@@ -57,8 +84,10 @@ print(filesToGraph);
 
 # reading two csv files
 data1 = pd.read_csv(str(path2)+'PivotBG_wCN'+'.csv')
+# ValueCh = original value of a removed reading, 0 for a kept one.
 data2 = pd.read_csv(str(path2)+filesToGraph[0],usecols = ['Time','ValueCh']);
 # Replace Values in Column
+# Blank the zeros so only the removed readings remain.
 data2['ValueCh'] = data2['ValueCh'].replace(0,'');
 data2.rename(columns = {'ValueCh':'BGValue'+str(0)}, inplace = True);
 data2.rename(columns = {'Time':'Key'}, inplace = True);
@@ -87,6 +116,7 @@ output1.to_csv(str(path2)+str(fileToSave));
 # -----------------------------------------------------------#
 #              Graph 
 # -----------------------------------------------------------#
+# Re-read the joined table and convert Key "HH:MM:SS" to hours for the x axis.
 df =  pd.read_csv(str(path2)+str(fileToSave));
 Key=df["Key"].to_numpy();
 
@@ -109,6 +139,7 @@ for col in df.columns:
         print(col);
         columns.append(col);
 
+# One scatter per day: x = time of day, y = day index, z = BG (mg/dL).
 for i in range(len(columns)):
     threedee.scatter(df["Time1"],i,df["BGValue"+str(i)]);
 
@@ -118,6 +149,7 @@ threedee.set_zlabel('Blood glucose levels \n mg/dL (mmol/L)', labelpad=60);
 threedee.tick_params(axis='z', pad=20);
 
 zticks_mgdl = [0, 90, 180, 270, 360];
+# z axis in mg/dL with the mmol/L value in brackets on each tick.
 threedee.set_zlim(0, 400);
 threedee.set_zticks(zticks_mgdl);
 threedee.set_zticklabels([f"{v} ({v*MGDL_TO_MMOL:.0f})" for v in zticks_mgdl]);

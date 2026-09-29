@@ -1,9 +1,17 @@
-#Code: globals.py
-#Description: Central configuration for the experiment 1 pipeline.
-#             Every script imports this module, so all paths, IDs and
-#             constants live here and nowhere else. Do not hardcode any
-#             of these values inside individual scripts.
-#Author: mbaxdg6
+"""
+globals.py
+Central configuration for the experiment 1 (paper 1) pipeline.
+
+Every script imports this module, so all paths, IDs and constants live here
+and nowhere else. Do not hardcode any of these values inside individual
+scripts.
+
+Author: mbaxdg6 (Daniel Gasca Garcia)
+
+Note on figures: the "Agg" backend selected below never opens a window, so
+the plt.show() calls left in the plotting scripts do nothing when this module
+is imported first. Figures are only written by the explicit savefig calls.
+"""
 
 import os
 import matplotlib
@@ -28,7 +36,7 @@ matplotlib.use("Agg")
 #
 # Results produced in demo mode are meaningless. Do not compare them with
 # anything reported in the manuscript.
-DEMO = True
+DEMO = False
 
 # -----------------------------------------------------------#
 # Paths
@@ -69,10 +77,11 @@ for _p in (path2, path3, path4):
 # built-in function instead. Rename to patient_id if this ever bites.
 id = int(os.environ.get("PATIENT_ID", 559))
 
-# Participants included in this experiment: the six OhioT1DM subjects that
-# report self-reported activity. Used by the aggregation scripts that plot
-# all participants at once (G.GraphResults.py), and by
-# the orchestrator to decide which synthetic files to generate in demo mode.
+# Participants included in this experiment: the six OhioT1DM subjects of the
+# 2018 release, whose Basis Peak band reports step counts (see paper 1,
+# Participants). Used by the aggregation scripts that plot all participants
+# at once (G.GraphResults.py), and by the orchestrator to decide which
+# synthetic files to generate in demo mode.
 ids = [559, 563, 570, 575, 588, 591]
 
 # Participant shown as the worked example in the manuscript. Scripts that
@@ -104,6 +113,8 @@ FIGURE_TITLES = False
 # Shared z-axis range for the three panels of Figure 3, in mg/dL, so the
 # panels are directly comparable.
 FIG3_ZLIM_MGDL = (0, 400)
+# NOTE: the three Figure 3 scripts currently set the same range with
+# set_zlim(0, 400) directly instead of reading this value.
 
 # -----------------------------------------------------------#
 # Unit conversion

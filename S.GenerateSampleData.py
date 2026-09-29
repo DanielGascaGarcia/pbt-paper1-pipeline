@@ -1,5 +1,5 @@
 """
-generate_sample_data.py — synthetic OhioT1DM-format data for smoke-testing the pipeline.
+S.GenerateSampleData.py — synthetic OhioT1DM-format data for smoke-testing the pipeline.
 
 The OhioT1DM dataset cannot be redistributed (it requires a Data Use Agreement
 with the University of North Carolina at Charlotte). This script generates
@@ -14,10 +14,25 @@ Usage:
     python S.GenerateSampleData.py --out ./sample_data --days 5
     python S.GenerateSampleData.py --out ./sample_data --ids 559 588
 
-NOTE: the parser assigns CSV column names by the position of each child element,
-not by its tag name, so the order of the <basis_*> blocks below must match the
-real files exactly (heart_rate, gsr, skin_temperature, air_temperature, steps,
-sleep). Reordering them silently mislabels the output columns.
+NOTE: 1.ColumnNamer.py and 2.Disaggregator.py assign column names by the
+position of each top-level element, not by its tag name, so the order of ALL
+the blocks written below must match the real files exactly: glucose_level,
+finger_stick, basal, temp_basal, bolus, meal, sleep, work, stressors,
+hypo_event, illness, exercise, then the <basis_*> blocks (heart_rate, gsr,
+skin_temperature, air_temperature, steps, sleep). Reordering them silently
+mislabels the output columns.
+
+What is simulated (per participant, per day)
+    - CGM every 5 min: drift towards 120 mg/dL, a dawn rise between 04:00 and
+      08:00, noise, and a rise-then-fall excursion after each meal, clipped to
+      45-380 mg/dL.
+    - Meals: breakfast, lunch, dinner, and a snack on about half of the days,
+      with jittered times and carbohydrate amounts; one bolus 5 min before
+      each meal.
+    - Basal: four rate changes a day (00, 06, 12, 18 h).
+    - Sleep, work, and wristband heart rate, GSR, temperatures and steps
+      (steps are 0 between 23:00 and 06:59).
+    - Dates start in 2030 so the files are obviously synthetic.
 """
 
 import argparse
@@ -191,7 +206,7 @@ def main():
     (out / "README.txt").write_text(
         "SYNTHETIC DATA - NOT PATIENT DATA\n"
         "=================================\n\n"
-        "These files were produced by generate_sample_data.py. They follow the\n"
+        "These files were produced by S.GenerateSampleData.py. They follow the\n"
         "OhioT1DM XML schema so that the pipeline can be executed end to end,\n"
         "but every value is simulated.\n\n"
         "They must not be used to reproduce or interpret any reported result.\n"

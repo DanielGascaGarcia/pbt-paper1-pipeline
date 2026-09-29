@@ -8,7 +8,7 @@ Submitted to *BMC Medical Informatics and Decision Making* — under review.
 
 A pipeline to parse and harmonise **CGM / insulin / activity** data, estimate
 **hourly relative BG change**, simulate **active insulin** from basal
-(Rayleigh-like kernel), and produce the integrated outputs and figures reported
+(Rayleigh kernel, peak at 1 h), and produce the integrated outputs and figures reported
 in the manuscript.
 
 This release regenerates every figure and table reported in the current version
@@ -24,7 +24,7 @@ different values — see *Changes in this release*.
 - Meal-related data exclusion and tagging for BG
 - Aggregation and imputation of **basal** and **activity**
 - Hourly **relative BG change** and 24-hour **median** profile with reliability flag
-- **Active insulin** simulation from basal (Rayleigh-like kernel)
+- **Active insulin** simulation from basal (Rayleigh kernel, peak at 1 h)
 - Final merge for multi-panel figures (ΔBG, basal / active insulin, activity)
 
 The analysis covers the six OhioT1DM participants whose sensor band reports
@@ -43,7 +43,7 @@ dataset. The training split provides between 41 and 46 days per participant
 - Intermediate files produced by the pipeline itself, written to `processed/`
 - Configuration in `globals.py`
 
-> **Time key:** `Key` (datetime; 1–5 min resolution depending on step).
+> **Time key:** `Key`, time of day as text `HH:MM:SS` (1-minute grid in most steps, 5 minutes in the basal simulation).
 
 CGM coverage is not uniform across days: some days carry fewer than the 288
 readings a complete day would hold. No day is excluded on that basis. Hours
@@ -83,9 +83,17 @@ access to the real data. See *Demo mode* below.
 | `BasalSimulated{id}.csv` | `ActiveInsulin` and `BasalInfused` (~5-min resolution) |
 | `ComparisonJoined{id}.csv` | final integrated table for figures |
 
-Every figure that carries a number in the manuscript also has a corresponding
-CSV under `results/tables/`, so the reported values can be checked without
-re-running the pipeline.
+### Tables, in `results/tables/`, and where they are used
+
+| File | Contents | Use |
+|---|---|---|
+| `Figure12_data.csv`, `Figure12_key_values.csv` | hours by insulin condition per participant, and the values quoted in the text (off-target %, optimal hours per participant) | reported |
+| `SumUMedRelChange_byID.csv`, `SummaryStats_UMedRelChange.csv` | per participant, the daily cumulative absolute relative change, and its mean and SD | reported |
+| `MedRelChange_extremes.csv` | range of the hourly medians across participants | reported |
+| `CGMCoverage_byID.csv`, `CGMCoverage_byDay.csv` | sensor coverage per participant and per day | reported (days per participant) and diagnostic |
+
+Every figure that carries a number in the manuscript has a corresponding CSV
+here, so the reported values can be checked without re-running the pipeline.
 
 ---
 
@@ -190,8 +198,7 @@ python S.GenerateSampleData.py --out ./sample_data --days 5 --ids 559 588
 
 **Demo output is meaningless.** It exists to show that the code runs, not to
 approximate any result. With the default five days per participant the figures
-are sparse and the last day of each participant is incomplete, because the
-midnight-overflow trimming needs the following day to close. That is expected.
+are sparse. That is expected.
 
 ### A note on state
 
@@ -231,8 +238,10 @@ by the `G.Graph3D*` scripts.
 
 ## Configuration
 
-All configuration lives in `globals.py`. Nothing is hardcoded in the individual
-scripts.
+`globals.py` holds the paths, the participants, the unit conversion and the
+figure switches. The parameters of the method itself (exclusion window,
+reliability percentiles, activity quartiles, insulin action curve) are set in
+the scripts that use them and are described in those scripts' headers.
 
 | Name | Purpose |
 |---|---|
@@ -244,7 +253,7 @@ scripts.
 | `DEMO_SEED` | base seed for the generator, so demo runs are reproducible |
 | `MGDL_TO_MMOL` | unit conversion factor (1/18) |
 | `FIGURE_TITLES` | `False` for submission figures; `True` to render titles for local review |
-| `FIG3_ZLIM_MGDL` | shared z-axis range for the three panels of Figure 3 |
+| `FIG3_ZLIM_MGDL` | z-axis range of Figure 3 (0–400 mg/dL); the three Figure 3 scripts currently set the same range directly rather than reading it |
 | `path1`-`path4` | input, `processed/`, `results/figures/`, `results/tables/` |
 
 `path1` resolves to `raw/` or to `sample_data/` depending on `DEMO`; `path2` to
@@ -312,6 +321,27 @@ yourself, and only when running against the real dataset.
   manuscript were updated accordingly; the changes are on the order of one
   percentage point and no conclusion is affected.
 
+- **Median of daily step totals.** `5.AggregationExercise.py` computed the
+  per-hour median of steps over all numeric columns after adding the mean
+  column, so the mean entered the median as one more day. The median is now
+  taken over the day columns only. This changes the activity category of 2 of
+  the 144 participant-hours (559 at 09:00 and 575 at 19:00, both high to
+  medium) and the plotted step values slightly; no number reported in the
+  manuscript changes.
+
+- **Midnight overflow of the meal window.** When a meal window passed
+  midnight, `4.MealBolusDetection.py` removed the remainder from the next CGM
+  file in date order, whatever its date, and on the last day of a participant
+  it tried to open a file that does not exist; the error stopped the removal
+  for the rest of that day, so post-meal readings stayed in the data. The
+  remainder is now removed only when the next file is the next calendar day,
+  and the last day is processed completely. This changes three participants:
+  the daily cumulative absolute relative change of 570 goes from 126.5 to
+  122.5 mg/dL, of 588 from 118.5 to 147.5 and of 591 from 114.0 to 115.5; the
+  mean from 117.42 (SD 25.08) to 121.83 (SD 27.81); the minimum hourly median
+  from −20.5 to −35.0 mg/dL (588, 21:00); off-target hours from 90.3% to
+  91.0%; optimal hours per participant from 2.0 to 1.83.
+
 Every figure and table in the current version of the manuscript was regenerated
 from this release.
 
@@ -320,10 +350,17 @@ from this release.
 The analysis, thresholds, exclusion windows and statistical treatment are
 unchanged by everything in this subsection.
 
-- **Configuration centralised.** Participant IDs, the unit conversion factor,
-  the figure-title switch and the shared axis range moved into `globals.py`.
+- **Configuration centralised.** Participant IDs, the unit conversion factor
+  and the figure-title switch moved into `globals.py`.
   One script had a participant ID hardcoded; it produces an illustrative figure
   only and does not feed the results chain.
+- **Axis labels corrected.** The basal panel of Figures 2 and 6–11 is labelled
+  in U/h (both curves are rates per hour), the reliability legend of the same
+  figures is spelled correctly, and the x axis of Figure 13 is labelled "ID".
+- **No stray points in empty hours.** The interpolation that fills the basal
+  curve between its 5-minute values also reached the BG columns and drew a
+  point in the last minutes of hours without BG data. The BG columns are now
+  restored after it; no number changes.
 - **Units reported in both scales.** Summary tables carry both mg/dL and mmol/L
   columns. Figures showing glucose carry both scales natively: secondary axes on
   the box plots, dual-unit tick labels on the heat map colour bar and on the 3D
@@ -354,35 +391,38 @@ unchanged by everything in this subsection.
   unrelated error several steps later.
 - **A failed step now stops the run** with a non-zero exit status, and the
   aggregate scripts are not executed on an incomplete set.
+- `G.Graph3DCleanBG.py` (Figure 3c) now uses `globals.idG`, like panels 3a and
+  3b, so the three panels show the same participant also when the script is
+  run on its own. The figure produced by the orchestrator does not change.
 
 ---
 
 ## Documented limitations
 
-- **Column naming depends on element order in the source XML.** `1.ColumnNamer.py`
-  assigns column names by position (index 0 = glucose level, 1 = finger stick,
-  2 = basal, and so on). This matches the OhioT1DM file structure but would
-  mislabel columns if applied to XML with the variables in a different order —
-  silently, with no error until several steps later. The synthetic generator
-  emits the elements in the required order for the same reason.
-- **Parsing failures are silent.** The parsing and column-naming steps wrap each
-  variable in a bare `except` and print a message rather than stopping. A
-  variable that fails to parse produces no `_wCN` file and the pipeline
-  continues. Check the console output of steps 0 and 1 before trusting a run.
-- **Day columns are ordered by the filesystem.** `5.MergeBGClean.py` collects
-  per-day files with `os.listdir` without sorting, so the day columns of
-  `BGwNMLeftJoined{id}.csv` (`BGValue0`, `BGValue1`, …) are indexed in
-  filesystem order rather than by date. No reported statistic depends on that
-  order: all summaries are computed per hour of day or per participant. Note
-  that a naive `sorted()` would not fix this, because the filenames carry the
-  weekday before the date.
-- **Panel letters and annotation boxes are added manually.** `G.ComposeFigure3.py`
-  assembles and labels the panels of Figure 3. Elsewhere in the manuscript the
-  A/B/C markers and the boxes around the intervals they identify are applied
-  afterwards in an image editor. The underlying values are unaffected.
-- **Exact rendering is not guaranteed across systems.** Font availability and
-  backend differences change pixel output. The values are reproducible; the
-  rendering is not bit-identical.
+- **Input handling.** Column names are assigned by the position of each
+  element in the XML (`1.ColumnNamer.py`, `2.Disaggregator.py`), so a file with
+  the elements in another order is mislabelled silently. File names are parsed
+  with fixed offsets that assume a three-digit participant identifier.
+- **Day order.** `5.MergeBGClean.py` lists per-day files in filesystem order, so
+  the day columns of `BGwNMLeftJoined{id}.csv` and the "Day number" axis of
+  Figure 3 do not follow the calendar (the filenames start with the weekday). No
+  reported statistic depends on that order.
+- **Silent failures.** Steps 0 to 2 wrap each variable in a bare `except`, and
+  `4.MealBolusDetection.py` runs inside a single `try`, so an error stops the
+  remaining days and only prints "file not found". Check the console output
+  before trusting a run.
+- **Meal exclusion.** The window is a fixed 4 hours from each recorded meal.
+  The script also classifies each meal by time to peak and low-pass filters the
+  glucose to do so, but all classes remove the same window, so neither changes
+  the output.
+- **Activity levels.** An hour without any recorded steps counts as 0 steps.
+  When a participant has seven or more such hours, Q1 is 0 and no hour can be
+  "low" (559 and 588): their zero-step night hours are classified as medium.
+- **Environment.** pandas 2.2.2 is required: pandas 3 rejects interpolation of
+  a frame with a text column and position-based access by integer, both used
+  in the pipeline. Rendering is not bit-identical across systems.
+- **Figure annotations.** Panel letters and the A/B/C boxes outside Figure 3
+  are added afterwards in an image editor.
 
 ---
 

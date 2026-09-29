@@ -1,10 +1,22 @@
-#Code: G.ComposeFigure3.py
-#Description: Compose panels a, b and c into a single Figure 3.
-#             Reads the three PNGs already written to path3, trims the
-#             white border matplotlib leaves around a 3D axes, scales
-#             them to a common height and lays them out side by side
-#             with the panel letter centred underneath each one.
-#Author: mbaxdg6
+"""
+G.ComposeFigure3.py
+Figure 3 of paper 1: joins panels a, b and c into one image.
+
+Author: mbaxdg6 (Daniel Gasca Garcia)
+
+What it does
+    Reads Figure3a.png, Figure3b.png and Figure3c.png from path3 (written by
+    G.Graph3DComplete.py, G.Graph3DPeaksRemoved.py and G.Graph3DCleanBG.py),
+    trims the white border matplotlib leaves around a 3D axes, scales the
+    panels to a common height and lays them out side by side with the panel
+    letter centred underneath each one.
+
+Inputs
+    globals.path3; the three panel PNGs
+
+Output
+    <path3>/Figure3.png
+"""
 
 import os
 import numpy as np

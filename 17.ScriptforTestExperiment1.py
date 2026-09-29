@@ -1,7 +1,26 @@
-#Code: 17.ScriptforTestExperiment1.py
-#Description: Orchestrator for the experiment 1 pipeline. Runs every step in
-#             order, once per participant, then the aggregation scripts.
-#Author: mbaxdg6
+"""
+17.ScriptforTestExperiment1.py
+Orchestrator for the experiment 1 (paper 1) pipeline.
+
+Author: mbaxdg6 (Daniel Gasca Garcia)
+
+What it does
+    1. Demo mode (globals.DEMO = True): regenerates the synthetic input files.
+       Real mode: checks that the six OhioT1DM training files are in place and
+       stops with instructions if any is missing.
+    2. Clears the intermediate folder (path2), because several steps pick up
+       whatever per-day files they find there.
+    3. Runs steps 0 to 11 once per participant, in a separate Python process
+       each time, passing the participant through the PATIENT_ID variable.
+       A participant whose step fails is not run further.
+    4. Stops before the aggregation if any participant failed, or if any
+       participant did not produce a non-empty Boxplot<id>0-24total.csv.
+    5. Runs the aggregation and figure scripts once, with PATIENT_ID set to
+       globals.idG (the worked-example participant, 588).
+
+Usage
+    python 17.ScriptforTestExperiment1.py
+"""
 
 import subprocess
 import shutil
@@ -11,6 +30,7 @@ import globals
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
+# Per-participant steps, in execution order.
 scripts = [
     "0.Parser.py",
     "1.ColumnNamer.py",
@@ -33,6 +53,8 @@ scripts = [
     "11.MergeRChBasal.py",
 ]
 
+# Run once after all participants: tables and figures of paper 1.
+# G.ComposeFigure3.py goes last because it reads the three Figure 3 panels.
 final_scripts = [
     "G.CGMCoverage.py",
     "G.GraphResults.py",
