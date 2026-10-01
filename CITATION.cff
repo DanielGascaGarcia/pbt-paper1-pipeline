@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Personalised Basal Tuner (PBT) - Paper 1 Pipeline"
-version: "1.1.0"
+version: "1.2.0"
 authors:
   - family-names: "Gasca García"
     given-names: "Daniel"
