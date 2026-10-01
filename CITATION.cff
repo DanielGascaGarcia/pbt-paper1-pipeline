@@ -8,8 +8,8 @@ authors:
     affiliation: "Department of Computer Science, The University of Manchester"
 repository-code: "https://github.com/DanielGascaGarcia/pbt-paper1-pipeline"
 license: MIT
-date-released: "2026-07-30"
-doi: "10.5281/zenodo.XXXXXXX"
+date-released: "2026-10-01"
+doi: "10.5281/zenodo.17392920"
 preferred-citation:
   type: article
   title: "Personalised Basal Tuner (PBT): Retrospective Identification of Basal Insulin Miscalibration in People with Type 1 Diabetes Mellitus"
