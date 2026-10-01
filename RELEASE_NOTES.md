@@ -1,3 +1,6 @@
+DOI (this version): assigned on publication.
+Concept DOI, always resolving to the latest version: **10.5281/zenodo.17392920**
+
 ## Changes since the previous release
 
 This release corrects three defects, two of which change reported values. Every figure and table in the current version of the manuscript was regenerated from it.
@@ -28,7 +31,7 @@ This release corrects three defects, two of which change reported values. Every 
 - The per-participant summary files are checked after the loop. A run stops if any of them is absent or empty, rather than leaving the aggregate scripts to average over whatever is present.
 - A script listed in the orchestrator that is no longer part of the repository was removed from the aggregate sequence.
 - `G.Graph3DCleanBG.py` (Figure 3c) now uses `globals.idG`, like the scripts of panels 3a and 3b, so the three panels show the same participant also when the script is run on its own. The figure produced by the orchestrator does not change.
-- Verified by two independent runs from a clean state with the final code; all output tables were identical byte for byte.
+- Verified by two independent runs from a clean state with the final code; the eight tables in `results/tables/` were identical byte for byte.
 
 ## Running without the dataset
 
