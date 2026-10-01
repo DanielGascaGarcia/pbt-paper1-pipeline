@@ -153,8 +153,8 @@ shared the same display name, and running under the wrong one produced
 different output.
 
 Reproducibility was verified by executing the full pipeline two times from a
-clean state and comparing the resulting artefacts between runs. Seven artefacts
-were compared on each occasion and were identical byte for byte. To repeat the
+clean state and comparing the resulting artefacts between runs. The eight
+tables in `results/tables/` were compared and were identical byte for byte. To repeat the
 check, run the pipeline twice, copying the contents of `results/tables/` to a
 separate directory after the first run, and compare the two.
 
