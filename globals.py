@@ -36,7 +36,7 @@ matplotlib.use("Agg")
 #
 # Results produced in demo mode are meaningless. Do not compare them with
 # anything reported in the manuscript.
-DEMO = True
+DEMO = False
 
 # -----------------------------------------------------------#
 # Paths
@@ -91,9 +91,7 @@ idG = 588
 
 # Days per participant generated in demo mode. The real dataset provides
 # about 45 days per participant; a short synthetic run is enough to verify
-# that every step executes, but the figures it produces are sparse and the
-# last day is always incomplete, because the midnight-overflow trimming
-# needs the following day to close.
+# that every step executes, but the figures it produces are sparse.
 DEMO_DAYS = 5
 
 # Seed for the synthetic generator, so a demo run is reproducible. The

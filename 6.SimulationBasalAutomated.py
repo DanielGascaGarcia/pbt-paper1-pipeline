@@ -152,7 +152,7 @@ for i in range(len(II)):
         T_0 = [];
         for j in range(FP-len(BIEF)):
             T_0.append(0);
-        T_OF=np.array(T_0); #Correction.
+        T_OF=np.array(T_0); # zero padding to full length
         BIEFF=np.concatenate((BIEF,T_OF),axis=0);    
     if InsulinV[i]==2:   
         T_0 = [];
@@ -168,7 +168,7 @@ for i in range(len(II)):
         T_0 = [];
         for j in range(FP-len(BIEF)):
             T_0.append(0);
-        T_OF=np.array(T_0); #Correction.
+        T_OF=np.array(T_0); # zero padding to full length
         BIEFF=np.concatenate((BIEF,T_OF),axis=0);    
     if InsulinV[i]==3:   
         T_0 = [];
@@ -184,7 +184,7 @@ for i in range(len(II)):
         T_0 = [];
         for j in range(FP-len(BIEF)):
             T_0.append(0);
-        T_OF=np.array(T_0); #Correction.
+        T_OF=np.array(T_0); # zero padding to full length
         BIEFF=np.concatenate((BIEF,T_OF),axis=0);    
     if InsulinV[i]==4:   
         T_0 = [];
@@ -200,7 +200,7 @@ for i in range(len(II)):
         T_0 = [];
         for j in range(FP-len(BIEF)):
             T_0.append(0);
-        T_OF=np.array(T_0); #Correction.
+        T_OF=np.array(T_0); # zero padding to full length
         BIEFF=np.concatenate((BIEF,T_OF),axis=0);    
     I_MAT[i,]=BIEFF;    
 # Total insulin action at every 5-min slot (sum over all doses).

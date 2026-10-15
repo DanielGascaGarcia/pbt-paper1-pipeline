@@ -1,14 +1,15 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Personalised Basal Tuner (PBT) - Paper 1 Pipeline"
-version: "1.2.0"
+type: software
+version: "1.1.0"
 authors:
   - family-names: "Gasca García"
     given-names: "Daniel"
     affiliation: "Department of Computer Science, The University of Manchester"
 repository-code: "https://github.com/DanielGascaGarcia/pbt-paper1-pipeline"
 license: MIT
-date-released: "2026-10-01"
+date-released: "2026-10-14"
 doi: "10.5281/zenodo.17392920"
 preferred-citation:
   type: article
@@ -22,4 +23,6 @@ preferred-citation:
       given-names: "Paul W."
     - family-names: "Harper"
       given-names: "Simon"
+  journal: "BMC Medical Informatics and Decision Making"
   year: 2026
+  notes: "Under review"

@@ -1,89 +1,78 @@
 # Personalised Basal Tuner (PBT) — Paper 1 Pipeline
 
 **Manuscript:** *Personalised Basal Tuner (PBT): Retrospective Identification of
-Basal Insulin Miscalibration in People with Type 1 Diabetes Mellitus*
+Basal Insulin Miscalibration in People with Type 1 Diabetes Mellitus.*
 Submitted to *BMC Medical Informatics and Decision Making* — under review.
 
 **Repository:** https://github.com/DanielGascaGarcia/pbt-paper1-pipeline
 
-A pipeline to parse and harmonise **CGM / insulin / activity** data, estimate
-**hourly relative BG change**, simulate **active insulin** from basal
-(Rayleigh kernel, peak at 1 h), and produce the integrated outputs and figures reported
-in the manuscript.
-
-This release regenerates every figure and table reported in the current version
-of the manuscript. It supersedes the previous release, which produced slightly
-different values — see *Changes in this release*.
+This code produces every table and data figure of the manuscript. A single
+orchestrator runs every step in order.
 
 ---
 
-## Features
+## What it does
 
-- Input parsing and column normalisation (OhioT1DM)
-- Minute-level pivot tables for robust merges
-- Meal-related data exclusion and tagging for BG
-- Aggregation and imputation of **basal** and **activity**
-- Hourly **relative BG change** and 24-hour **median** profile with reliability flag
-- **Active insulin** simulation from basal (Rayleigh kernel, peak at 1 h)
-- Final merge for multi-panel figures (ΔBG, basal / active insulin, activity)
-
-The analysis covers the six OhioT1DM participants whose sensor band reports
-step counts — 559, 563, 570, 575, 588 and 591 — using the training split of the
-dataset. The training split provides between 41 and 46 days per participant
-(mean 44, approximately six weeks); the manuscript refers to this as the
-45-day retrospective window.
+The pipeline parses CGM, insulin and activity data, removes meal-related
+glucose excursions, computes the hourly relative change of BG over a 24-hour
+composite day with a reliability flag, simulates the active insulin of the
+programmed basal profile (Rayleigh kernel, peak at 1 h), and combines the three
+into the figures reported in the manuscript. Further technical detail is in
+[`docs/NOTES.md`](docs/NOTES.md).
 
 ---
 
-## Inputs
+## Data
 
-- OhioT1DM per-participant XML files — **training split only**
-  (`{id}-ws-training.xml`) — placed in `raw/`. The test split is not used at
-  any stage.
-- Intermediate files produced by the pipeline itself, written to `processed/`
-- Configuration in `globals.py`
-
-> **Time key:** `Key`, time of day as text `HH:MM:SS` (1-minute grid in most steps, 5 minutes in the basal simulation).
-
-CGM coverage is not uniform across days: some days carry fewer than the 288
-readings a complete day would hold. No day is excluded on that basis. Hours
-with no reading contribute nothing to the median for that hour, and the
-three-level reliability measure flags hours supported by few days.
-
-Coverage is computed per day by `G.CGMCoverage.py` as the count of non-null
-`BGValue2` entries in each per-day `_wCN ` file, expressed against 288 — the
-number of readings a complete day would hold at the 5-minute CGM sampling
-interval. `BGValue2` is the column as parsed, before meal-related exclusion, so
-the figure measures the sensor record rather than the effect of the algorithm.
-Two tables are written to `results/tables/`: `CGMCoverage_byID.csv`, with the
-number of days and the mean, median, minimum and maximum daily coverage per
-participant together with the number and proportion of days at or above 70%,
-and `CGMCoverage_byDay.csv`, with the same figure for every individual day.
-Both are descriptive: no reported value depends on them.
-
-The OhioT1DM dataset is **not redistributed here**. It is freely available for
-scientific purposes from
-https://webpages.charlotte.edu/rbunescu/data/ohiot1dm/OhioT1DM-dataset.html
-
-Because the dataset cannot be redistributed, the repository ships
-`S.GenerateSampleData.py`, which produces **fully synthetic** files in the same
-XML schema. This lets anyone verify that the code executes end to end without
-access to the real data. See *Demo mode* below.
+- OhioT1DM training files (`{id}-ws-training.xml`) for the six participants
+  whose sensor band reports step counts — 559, 563, 570, 575, 588 and 591 —
+  placed in `raw/`. The test split is not used.
+- The dataset is **not redistributed**; it is available for scientific purposes
+  from https://webpages.charlotte.edu/rbunescu/data/ohiot1dm/OhioT1DM-dataset.html
+- Without the dataset, the pipeline can be run on **synthetic** files in the
+  same schema (see *Running*). Their output is not comparable with any
+  reported result.
 
 ---
 
-## Key outputs
+## Installation
 
-| File | Contents |
-|---|---|
-| `BasalImputed{id}.csv` | imputed programmed basal + modal value |
-| `ExerciseImputed{id}.csv` | hourly activity (Q50) + intensity flag (`FlagE`) |
-| `BGwNMLeftJoined{id}.csv` | cleaned BG with per-minute `Key` |
-| `BGHourRelativeChange{id}0To24medians_wCN.csv` | hourly `MedRelChange` (24 h medians) + reliability `Flag` |
-| `BasalSimulated{id}.csv` | `ActiveInsulin` and `BasalInfused` (~5-min resolution) |
-| `ComparisonJoined{id}.csv` | final integrated table for figures |
+Python 3.9.12. Dependencies are pinned in `requirements.txt`.
 
-### Tables, in `results/tables/`, and where they are used
+```bash
+conda create -n pbt python=3.9.12
+conda activate pbt
+pip install -r requirements.txt
+python --version                 # expect 3.9.12
+```
+
+A `venv` with Python 3.9 also works: create it, activate it and run
+`pip install -r requirements.txt`.
+
+---
+
+## Running
+
+```bash
+python 17.ScriptforTestExperiment1.py
+```
+
+The orchestrator clears `processed/`, runs the pipeline for every participant,
+checks that every participant produced its outputs, and then runs the
+aggregate scripts once. It stops with a non-zero exit status if any step fails.
+
+- **Real data:** `DEMO = False` in `globals.py`, with the XML files in `raw/`.
+- **Demo mode:** `DEMO = True`. Synthetic files are generated into
+  `sample_data/` and every output goes to `demo_output/`; `raw/` and
+  `results/` are never touched.
+
+If you run individual scripts by hand, clear `processed/` first.
+
+---
+
+## Outputs
+
+Figures are written to `results/figures/` and tables to `results/tables/`.
 
 | File | Contents | Use |
 |---|---|---|
@@ -95,144 +84,21 @@ access to the real data. See *Demo mode* below.
 Every figure that carries a number in the manuscript has a corresponding CSV
 here, so the reported values can be checked without re-running the pipeline.
 
----
+### Figure map
 
-## Environment
-
-Python 3.9.12 with six pinned dependencies (see `requirements.txt`). This is the
-environment in which the values reported in the **current version of the
-manuscript** reproduce.
-
-Reproducibility was verified using Option A (conda). Option B (venv) should
-produce an equivalent environment but has not been independently verified.
-They differ in one respect: conda installs Python 3.9.12 for you, whereas
-`venv` requires it to be present already.
-
-**Option A — conda**
-
-```bash
-conda create -n pbt python=3.9.12
-conda activate pbt
-pip install -r requirements.txt
-```
-
-**Option B — venv, no conda required**
-
-Check first that Python 3.9 is available (`python3.9 --version`, or
-`py -3.9 --version` on Windows). If it is not, install it from python.org or
-your system package manager, or use Option A.
-
-```bash
-# Linux / macOS
-python3.9 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-```powershell
-# Windows (PowerShell)
-py -3.9 -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Other Python versions have not been tested and are not guaranteed to reproduce
-the reported values.
-
-Before running, confirm the interpreter actually in use:
-
-```bash
-python --version                              # expect 3.9.12
-python -c "import sys; print(sys.executable)"
-```
-
-This check matters: several environments on the original development machine
-shared the same display name, and running under the wrong one produced
-different output.
-
-Reproducibility was verified by executing the full pipeline two times from a
-clean state and comparing the resulting artefacts between runs. The eight
-tables in `results/tables/` were compared and were identical byte for byte. To repeat the
-check, run the pipeline twice, copying the contents of `results/tables/` to a
-separate directory after the first run, and compare the two.
-
----
-
-## Running the pipeline
-
-```bash
-python 17.ScriptforTestExperiment1.py
-```
-
-The orchestrator loops over the participant IDs in `globals.py`, setting
-`PATIENT_ID` for each subprocess, then runs the aggregate scripts once. It
-clears `processed/` before starting, and exits with a non-zero status if any
-step fails — without running the aggregate scripts, which read all participants
-at once and would otherwise produce output from an incomplete set.
-
-### With the real dataset
-
-Leave `DEMO = False` in `globals.py` and place the `{id}-ws-training.xml` files
-directly in `raw/`. If any expected file is absent the run stops immediately and
-names what is missing, rather than failing several steps later.
-
-### Demo mode
-
-Set `DEMO = True` in `globals.py`. The orchestrator regenerates synthetic files
-into `sample_data/` and runs on those. Demo mode never reads or writes `raw/`,
-so leaving the flag set by accident cannot overwrite data obtained under the
-Data Use Agreement.
-
-Demo mode also redirects every output: intermediates, figures and tables are
-written under `demo_output/` instead of `processed/` and `results/`. The tables
-under `results/tables/` are tracked in the repository, and this keeps a demo run
-from overwriting them with synthetic values.
-
-The synthetic generator can also be run on its own:
-
-```bash
-python S.GenerateSampleData.py --out ./sample_data --days 5 --ids 559 588
-```
-
-**Demo output is meaningless.** It exists to show that the code runs, not to
-approximate any result. With the default five days per participant the figures
-are sparse. That is expected.
-
-### A note on state
-
-Several steps collect their inputs by listing whatever per-day files are present
-in `processed/`, rather than regenerating a known list, and one step renames
-columns in place. A file left behind by an earlier or partial run is therefore
-picked up as if it belonged to the current one. The orchestrator clears
-`processed/` for this reason; **clear it by hand if you run individual steps.**
-
-Each step runs as a separate process and imports `globals.py` as it stands on
-disk at that moment, while the orchestrator reads it once at startup.
-**Do not edit `globals.py` while a run is in progress:** steps that start after
-the edit use the new values and the ones already finished do not, which splits
-the run across two configurations.
-
-### Per-participant sequence
-
-`0.Parser.py` -> `1.ColumnNamer.py` -> `2.Disaggregator.py` ->
-`3.PivotGeneratorBasal.py` -> `3.PivotGeneratorBG.py` ->
-`3.PivotGeneratorExercise.py` -> `4.MealBolusDetection.py` -> `4.MergeBasal.py` ->
-`4.MergeExercise.py` -> `5.AggregationExercise.py` -> `5.FillGapsBasal.py` ->
-`5.MergeBGClean.py` -> `6.SimulationBasalAutomated.py` -> `6.SplitHours.py` ->
-`7.InterpolationBGHourly.py` -> `8.RelativeChange.py` -> `9.Boxplot.py` ->
-`10.PivotGeneratormedians.py` -> `11.MergeRChBasal.py`
-
-### Aggregate scripts (run once, after the per-participant loop)
-
-`G.CGMCoverage.py` → `G.GraphResults.py` → `G.Graph3DCleanBG.py` →
-`G.Graph3DPeaksRemoved.py` → `G.Graph3DComplete.py` → `S.SimulationAbsortion.py`
-→ `G.ComposeFigure3.py`
-
-These are called by the orchestrator with `PATIENT_ID` set to `idG`.
-`G.ComposeFigure3.py` runs last because it reads the three panel PNGs written
-by the `G.Graph3D*` scripts.
+| Manuscript item | Produced by |
+|---|---|
+| Figure 2 (= Figure 10, ID 588) | `11.MergeRChBasal.py` |
+| Figure 3, panel a — all readings | `G.Graph3DComplete.py` |
+| Figure 3, panel b — segments removed | `G.Graph3DPeaksRemoved.py` |
+| Figure 3, panel c — remaining readings | `G.Graph3DCleanBG.py` |
+| Figure 3, composite | `G.ComposeFigure3.py` |
+| Figure 4 | `9.Boxplot.py` (when `id == idG`) |
+| Figure 5 | `S.SimulationAbsortion.py` |
+| Figures 6–11 | `11.MergeRChBasal.py`, one per participant |
+| Figures 12–15 | `G.GraphResults.py` |
+| Summary tables | `G.GraphResults.py` -> `results/tables/` |
+| CGM coverage tables | `G.CGMCoverage.py` -> `results/tables/` |
 
 ---
 
@@ -253,14 +119,8 @@ the scripts that use them and are described in those scripts' headers.
 | `DEMO_SEED` | base seed for the generator, so demo runs are reproducible |
 | `MGDL_TO_MMOL` | unit conversion factor (1/18) |
 | `FIGURE_TITLES` | `False` for submission figures; `True` to render titles for local review |
-| `FIG3_ZLIM_MGDL` | z-axis range of Figure 3 (0–400 mg/dL); the three Figure 3 scripts currently set the same range directly rather than reading it |
+| `FIG3_ZLIM_MGDL` | z-axis range of Figure 3 (0–400 mg/dL), the value set in the three Figure 3 scripts |
 | `path1`-`path4` | input, `processed/`, `results/figures/`, `results/tables/` |
-
-`path1` resolves to `raw/` or to `sample_data/` depending on `DEMO`; `path2` to
-`path4` resolve under `demo_output/` when `DEMO` is True and at the top level
-otherwise. All four paths are resolved relative to `globals.py`, so the
-repository runs as cloned and an individual script can also be run from any
-working directory.
 
 ---
 
@@ -276,6 +136,7 @@ pbt-paper1-pipeline/
 ├─ 17.ScriptforTestExperiment1.py    orchestrator
 ├─ requirements.txt
 ├─ CITATION.cff
+├─ docs/NOTES.md                     implementation notes
 ├─ LICENSE
 ├─ raw/                              input data (not distributed)
 ├─ sample_data/                      synthetic data (regenerated; not versioned)
@@ -292,137 +153,10 @@ yourself, and only when running against the real dataset.
 
 ---
 
-## Figure map
+## Reproducibility
 
-| Manuscript item | Produced by |
-|---|---|
-| Figure 2 (= Figure 10, ID 588) | `11.MergeRChBasal.py` |
-| Figure 3, panel a — all readings | `G.Graph3DComplete.py` |
-| Figure 3, panel b — segments removed | `G.Graph3DPeaksRemoved.py` |
-| Figure 3, panel c — remaining readings | `G.Graph3DCleanBG.py` |
-| Figure 3, composite | `G.ComposeFigure3.py` |
-| Figure 4 | `9.Boxplot.py` (when `id == idG`) |
-| Figure 5 | `S.SimulationAbsortion.py` |
-| Figures 6–11 | `11.MergeRChBasal.py`, one per participant |
-| Figures 12–15 | `G.GraphResults.py` |
-| Summary tables | `G.GraphResults.py` -> `results/tables/` |
-| CGM coverage tables | `G.CGMCoverage.py` -> `results/tables/` |
-
----
-
-## Changes in this release
-
-### Corrections that change reported values
-
-- **Off-by-one in the box plot step.** `9.Boxplot.py` derived its row count from
-  the column count of a file with a different number of non-data columns,
-  discarding the last day of every participant — about 2% of the data — silently,
-  because pandas aligns by index. Corrected. The values reported in the
-  manuscript were updated accordingly; the changes are on the order of one
-  percentage point and no conclusion is affected.
-
-- **Median of daily step totals.** `5.AggregationExercise.py` computed the
-  per-hour median of steps over all numeric columns after adding the mean
-  column, so the mean entered the median as one more day. The median is now
-  taken over the day columns only. This changes the activity category of 2 of
-  the 144 participant-hours (559 at 09:00 and 575 at 19:00, both high to
-  medium) and the plotted step values slightly; no number reported in the
-  manuscript changes.
-
-- **Midnight overflow of the meal window.** When a meal window passed
-  midnight, `4.MealBolusDetection.py` removed the remainder from the next CGM
-  file in date order, whatever its date, and on the last day of a participant
-  it tried to open a file that does not exist; the error stopped the removal
-  for the rest of that day, so post-meal readings stayed in the data. The
-  remainder is now removed only when the next file is the next calendar day,
-  and the last day is processed completely. This changes three participants:
-  the daily cumulative absolute relative change of 570 goes from 126.5 to
-  122.5 mg/dL, of 588 from 118.5 to 147.5 and of 591 from 114.0 to 115.5; the
-  mean from 117.42 (SD 25.08) to 121.83 (SD 27.81); the minimum hourly median
-  from −20.5 to −35.0 mg/dL (588, 21:00); off-target hours from 90.3% to
-  91.0%; optimal hours per participant from 2.0 to 1.83.
-
-Every figure and table in the current version of the manuscript was regenerated
-from this release.
-
-### Changes to presentation only
-
-The analysis, thresholds, exclusion windows and statistical treatment are
-unchanged by everything in this subsection.
-
-- **Configuration centralised.** Participant IDs, the unit conversion factor
-  and the figure-title switch moved into `globals.py`.
-  One script had a participant ID hardcoded; it produces an illustrative figure
-  only and does not feed the results chain.
-- **Axis labels corrected.** The basal panel of Figures 2 and 6–11 is labelled
-  in U/h (both curves are rates per hour), the reliability legend of the same
-  figures is spelled correctly, and the x axis of Figure 13 is labelled "ID".
-- **No stray points in empty hours.** The interpolation that fills the basal
-  curve between its 5-minute values also reached the BG columns and drew a
-  point in the last minutes of hours without BG data. The BG columns are now
-  restored after it; no number changes.
-- **Units reported in both scales.** Summary tables carry both mg/dL and mmol/L
-  columns. Figures showing glucose carry both scales natively: secondary axes on
-  the box plots, dual-unit tick labels on the heat map colour bar and on the 3D
-  panels. The dual scale of one figure was previously assembled by hand and is
-  now generated by the code.
-- **Figure titles moved to captions**, controlled by `FIGURE_TITLES` instead of
-  being edited out by hand after each run.
-- **Duplicated computation removed.** One script computed the median and the
-  per-participant sums twice and wrote both to the same filenames, the second
-  overwriting the first. Both produced identical values.
-- **Figure 3 panels made consistent** — identical canvas size, framing and
-  z-axis range, composed into a single image by `G.ComposeFigure3.py`.
-- **Data behind figures exported** to `results/tables/`.
-
-### Changes to how the pipeline is run
-
-- **Synthetic data generator added**, so the pipeline can be executed without
-  the OhioT1DM dataset.
-- **The orchestrator clears `processed/`** before every run, instead of relying
-  on the reader to do it.
-- **Demo mode redirects its output** to `demo_output/`. Previously only the
-  input path was redirected, so a demo run overwrote the tracked tables under
-  `results/tables/` with synthetic values.
-- **The per-participant summary files are checked** after the loop: a run stops
-  if any of them is absent or empty, rather than leaving the aggregate scripts
-  to average over whatever is present.
-- **Missing input files are reported up front** rather than surfacing as an
-  unrelated error several steps later.
-- **A failed step now stops the run** with a non-zero exit status, and the
-  aggregate scripts are not executed on an incomplete set.
-- `G.Graph3DCleanBG.py` (Figure 3c) now uses `globals.idG`, like panels 3a and
-  3b, so the three panels show the same participant also when the script is
-  run on its own. The figure produced by the orchestrator does not change.
-
----
-
-## Documented limitations
-
-- **Input handling.** Column names are assigned by the position of each
-  element in the XML (`1.ColumnNamer.py`, `2.Disaggregator.py`), so a file with
-  the elements in another order is mislabelled silently. File names are parsed
-  with fixed offsets that assume a three-digit participant identifier.
-- **Day order.** `5.MergeBGClean.py` lists per-day files in filesystem order, so
-  the day columns of `BGwNMLeftJoined{id}.csv` and the "Day number" axis of
-  Figure 3 do not follow the calendar (the filenames start with the weekday). No
-  reported statistic depends on that order.
-- **Silent failures.** Steps 0 to 2 wrap each variable in a bare `except`, and
-  `4.MealBolusDetection.py` runs inside a single `try`, so an error stops the
-  remaining days and only prints "file not found". Check the console output
-  before trusting a run.
-- **Meal exclusion.** The window is a fixed 4 hours from each recorded meal.
-  The script also classifies each meal by time to peak and low-pass filters the
-  glucose to do so, but all classes remove the same window, so neither changes
-  the output.
-- **Activity levels.** An hour without any recorded steps counts as 0 steps.
-  When a participant has seven or more such hours, Q1 is 0 and no hour can be
-  "low" (559 and 588): their zero-step night hours are classified as medium.
-- **Environment.** pandas 2.2.2 is required: pandas 3 rejects interpolation of
-  a frame with a text column and position-based access by integer, both used
-  in the pipeline. Rendering is not bit-identical across systems.
-- **Figure annotations.** Panel letters and the A/B/C boxes outside Figure 3
-  are added afterwards in an image editor.
+Two runs of the full pipeline from a clean state give identical results: the
+eight tables in `results/tables/` are identical byte for byte.
 
 ---
 

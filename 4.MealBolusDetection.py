@@ -44,9 +44,7 @@ Assumptions worth knowing
     - The overflow past midnight is removed from the next CGM file only when
       that file is the next calendar day (has_next_day). After a gap in the
       record, or on the last day, today's window is capped at 23:59:59 and
-      nothing is removed elsewhere. Earlier versions used the next file in
-      date order whatever its date, and on the last day tried to open a file
-      that does not exist.
+      nothing is removed elsewhere.
     - The whole main program is inside one try/except. Any error stops the
       processing of all remaining days and only prints "file not found".
 """
@@ -269,9 +267,9 @@ try:
 #                 High Glycemic Food
 # -----------------------------------------------------------#  
                                     # Classification by time to peak: <1.5 h high, 1.5-2.5 h
-                                    # medium, >=2.5 h low glycaemic. NOTE: all three classes
-                                    # remove the same window (meal to meal + 4 h); the class is
-                                    # only printed.
+                                    # medium, >=2.5 h low glycaemic. The class is reported
+                                    # in the console and is not used by later steps; the same
+                                    # window (meal to meal + 4 h) is used for every class.
                                     if  0<=TypeFood<1.5:
                                         print("High Glycemic Food");
                                         # Removal window: dtH1 = meal time, dtH2 = meal + 4 h.

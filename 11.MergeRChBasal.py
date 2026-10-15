@@ -39,15 +39,12 @@ Notes
     - Units of the top panel: with a constant basal rate the simulated action
       profile settles at the same number as the rate (checked: rate 1.0 ->
       action 0.98-1.02), so both curves are in the units of the OhioT1DM
-      basal value, a rate per hour, hence the "(U/h)" axis label. (Earlier
-      versions labelled it "(U)".)
+      basal value, a rate per hour, hence the "(U/h)" axis label.
     - Only the backward interpolation is kept: the forward one on the line
       before is overwritten and has no effect. With limit=5 it fills the 4
-      minutes between basal values. It also filled the last 5 minutes of an
-      hour with no BG data (588 at 13:00 and 20:00), drawing a stray point
-      inside those hours; the BG columns are now restored after it, so
-      those hours stay empty. No number changes: G.GraphResults.py reads
-      minute 1 of each hour, which was never filled.
+      minutes between basal values. The BG columns are restored after it,
+      so an hour with no BG data (588 at 13:00 and 20:00) stays empty.
+      G.GraphResults.py reads minute 1 of each hour.
     - interpolate() also sees the text column Key; pandas 2.2.2 only warns
       about it (not hidden here), newer pandas raise an error.
     - Legend ordering assumes all three reliability levels are present. If

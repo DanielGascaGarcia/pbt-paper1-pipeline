@@ -31,12 +31,7 @@ Notes
     - An hour with no step readings in a day sums to 0, so it counts as
       "0 steps" rather than as missing data.
     - The mean, median, Q25 and Q75 are computed on the day columns
-      (BStepsValue*) only. Earlier versions computed them on all numeric
-      columns, so Q50ExerciseValue also included MeanExerciseValue. For the
-      six participants of paper 1 this changed FlagE in 2 of 144 hours
-      (559 at 09:00 and 575 at 19:00, both high -> medium); the median step
-      values themselves can shift slightly in any hour.
-      Only Q50ExerciseValue is saved.
+      (BStepsValue*) only. Only Q50ExerciseValue is saved.
     - Because each hourly total is repeated 60 times, the quartiles used for
       the flag are effectively quartiles of 24 hourly values.
 """

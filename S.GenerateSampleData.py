@@ -1,6 +1,8 @@
 """
 S.GenerateSampleData.py — synthetic OhioT1DM-format data for smoke-testing the pipeline.
 
+Author: mbaxdg6 (Daniel Gasca Garcia)
+
 The OhioT1DM dataset cannot be redistributed (it requires a Data Use Agreement
 with the University of North Carolina at Charlotte). This script generates
 FULLY SYNTHETIC files that follow the same XML schema, so that anyone can run
@@ -215,9 +217,7 @@ def main():
         f"Generated: {len(args.ids)} participant(s), {args.days} day(s) each, "
         f"base seed {args.seed}.\n"
         "A short run is enough to verify that every pipeline step executes, but\n"
-        "the resulting figures are sparse and the last day of each participant\n"
-        "is incomplete, because the midnight-overflow trimming needs the\n"
-        "following day to close. This is expected, not a fault.\n",
+        "the resulting figures are sparse. This is expected.\n",
         encoding="utf-8",
     )
     print(f"wrote {out / 'README.txt'}")

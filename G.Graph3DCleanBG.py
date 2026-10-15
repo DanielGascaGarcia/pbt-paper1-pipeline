@@ -17,8 +17,7 @@ Output
 Notes
     - Uses globals.idG, like panels 3a and 3b, so the three panels always
       show the same participant, whether run from the orchestrator or on its
-      own. (Earlier versions used globals.id, which matched only when run
-      from the orchestrator.)
+      own.
     - The optional title still says "after removing boluses"; the step is now
       called meal-related data exclusion.
     - "Day number" follows the column order of BGwNMLeftJoined<id>.csv, i.e.

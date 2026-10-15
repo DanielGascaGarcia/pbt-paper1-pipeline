@@ -10,8 +10,6 @@ What it does
     4 and 8 h) over 0-12 h. The peak of a Rayleigh density is at its scale,
     so the curves peak at 1, 2, 4 and 8 h. The curve with scale 1 h is the
     one used for rapid-acting insulin in 6.SimulationBasalAutomated.py.
-    (The original header described a blood glucose simulation from boluses;
-    that is not what this script does.)
 
 Inputs
     globals.path3, globals.FIGURE_TITLES   (no data files)

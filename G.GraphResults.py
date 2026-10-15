@@ -53,7 +53,7 @@ Notes
     - The two sort_values(by=['ID']) calls do not assign their result, so they
       have no effect (the rows are already in ID order).
     - Figure 13: the x axis is the participant ID and the colour is the
-      category. (Earlier versions labelled the x axis "Category".)
+      category.
     - The first box plot (sums per participant) is drawn but not saved.
 """
 
